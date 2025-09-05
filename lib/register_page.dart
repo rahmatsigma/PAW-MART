@@ -1,49 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/register_page.dart';
-import 'package:myapp/login_page.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Login Page',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 36, 121, 241),
-        ),
-      ),
-      home: const LoginPage(),
-    );
-  }
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
-
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmController = TextEditingController();
   bool _obscurePassword = true;
+  bool _obscureConfirm = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Login'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Registrasi Akun'), centerTitle: true),
       body: Center(
         child: SingleChildScrollView(
           child: ConstrainedBox(
@@ -60,11 +35,20 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(
-                      Icons.lock_outline,
+                      Icons.person_add,
                       size: 64,
                       color: Color.fromARGB(255, 36, 121, 241),
                     ),
                     const SizedBox(height: 16),
+                    TextField(
+                      controller: _nameController,
+                      decoration: const InputDecoration(
+                        labelText: 'Nama',
+                        prefixIcon: Icon(Icons.person),
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
                     TextField(
                       controller: _emailController,
                       decoration: const InputDecoration(
@@ -96,27 +80,52 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: _confirmController,
+                      obscureText: _obscureConfirm,
+                      decoration: InputDecoration(
+                        labelText: 'Konfirmasi Password',
+                        prefixIcon: const Icon(Icons.lock),
+                        border: const OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureConfirm
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscureConfirm = !_obscureConfirm;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 28),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          // Dummy akun terdaftar
-                          const registeredEmail = 'user@example.com';
-                          const registeredPassword = 'password123';
-
-                          if (_emailController.text != registeredEmail ||
-                              _passwordController.text != registeredPassword) {
+                          // Implementasi registrasi di sini
+                          if (_passwordController.text !=
+                              _confirmController.text) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text('Akun belum terdaftar!'),
+                                content: Text('Password tidak sama!'),
                                 backgroundColor: Color.fromARGB(255, 0, 0, 0),
                               ),
                             );
                           } else {
-                            // Berhasil login (implementasi lanjutan di sini)
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Registrasi berhasil!'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
                           }
                         },
+                        child: const Text('Daftar'),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           textStyle: const TextStyle(fontSize: 18),
@@ -124,29 +133,6 @@ class _LoginPageState extends State<LoginPage> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: const Text('Login'),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const RegisterPage(),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          textStyle: const TextStyle(fontSize: 18),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: const Text('Registrasi'),
                       ),
                     ),
                   ],
