@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/register_page.dart';
 import 'package:myapp/login_page.dart';
+import 'package:myapp/beranda_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -114,7 +115,12 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             );
                           } else {
-                            // Berhasil login (implementasi lanjutan di sini)
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const BerandaPage(),
+                              ),
+                            );
                           }
                         },
                         style: ElevatedButton.styleFrom(
