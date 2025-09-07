@@ -102,23 +102,43 @@ class _LoginPageState extends State<LoginPage> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          // Dummy akun terdaftar
-                          const registeredEmail = 'user@example.com';
-                          const registeredPassword = 'password123';
+                          // Data dummy akun terdaftar
+                          const accounts = [
+                            {
+                              'email': 'user@example.com',
+                              'password': 'password123',
+                            },
+                            {
+                              'email': 'admin@example.com',
+                              'password': 'adminpass',
+                            },
+                            {
+                              'email': 'riski@gmail.com',
+                              'password': 'riski2341',
+                            },
+                          ];
 
-                          if (_emailController.text != registeredEmail ||
-                              _passwordController.text != registeredPassword) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Akun belum terdaftar!'),
-                                backgroundColor: Color.fromARGB(255, 0, 0, 0),
-                              ),
-                            );
-                          } else {
+                          final inputEmail = _emailController.text;
+                          final inputPassword = _passwordController.text;
+
+                          final found = accounts.any(
+                            (acc) =>
+                                acc['email'] == inputEmail &&
+                                acc['password'] == inputPassword,
+                          );
+
+                          if (found) {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => const BerandaPage(),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Akun belum terdaftar!'),
+                                backgroundColor: Color.fromARGB(255, 0, 0, 0),
                               ),
                             );
                           }

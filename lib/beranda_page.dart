@@ -12,7 +12,7 @@ class BerandaPage extends StatelessWidget {
       ),
       body: Center(
         child: Text(
-          'Selamat datang di Beranda!',
+          'HIIIIIIDUUUPPPP JOOOKOOOWIIII',
           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
       ),
