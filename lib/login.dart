@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/register_page.dart';
+import 'package:myapp/beranda_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -36,10 +37,10 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      Icons.lock_outline,
-                      size: 64,
-                      color: Color.fromARGB(255, 36, 121, 241),
+                    Image.asset(
+                      'assets/images/logo.png',
+                      width: 64,
+                      height: 64,
                     ),
                     const SizedBox(height: 16),
                     TextField(
@@ -78,20 +79,46 @@ class _LoginPageState extends State<LoginPage> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          // Dummy akun terdaftar
-                          const registeredEmail = 'user@example.com';
-                          const registeredPassword = 'password123';
+                          const accounts = [
+                            {
+                              'email': 'user@example.com',
+                              'password': 'password123',
+                            },
+                            {
+                              'email': 'admin@example.com',
+                              'password': 'adminpass',
+                            },
+                            {
+                              'email': 'riski@gmail.com',
+                              'password': 'riski2341',
+                            },
+                          ];
 
-                          if (_emailController.text != registeredEmail ||
-                              _passwordController.text != registeredPassword) {
+                          final inputEmail = _emailController.text;
+                          final inputPassword = _passwordController.text;
+
+                          final found = accounts.any(
+                            (acc) =>
+                                acc['email'] == inputEmail &&
+                                acc['password'] == inputPassword,
+                          );
+
+                          if (found) {
+                          Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BerandaPage(
+                              email: inputEmail, // kirim email ke beranda
+                            ),
+                          ),
+                        );
+                            } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Akun belum terdaftar!'),
                                 backgroundColor: Color.fromARGB(255, 0, 0, 0),
                               ),
                             );
-                          } else {
-                            // Berhasil login (implementasi lanjutan di sini)
                           }
                         },
                         style: ElevatedButton.styleFrom(

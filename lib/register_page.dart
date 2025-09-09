@@ -107,7 +107,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          // Implementasi registrasi di sini
                           if (_passwordController.text !=
                               _confirmController.text) {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -120,7 +119,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Registrasi berhasil!'),
-                                backgroundColor: Colors.green,
+                                backgroundColor: Color.fromARGB(255, 0, 0, 0),
                               ),
                             );
                           }
