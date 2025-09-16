@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'pet_food.dart';
 import 'package:myapp/profile.dart';
 import 'package:myapp/login.dart';
 
@@ -13,13 +14,13 @@ class BerandaPage extends StatelessWidget {
       {"title": "Profile", "icon": Icons.person_outline},
       {"title": "Pengaturan", "icon": Icons.settings_outlined},
       {"title": "Notifikasi", "icon": Icons.notifications_outlined},
-      {"title": "Pesan", "icon": Icons.chat_bubble_outline},
+      {"title": "Pet Food", "icon": Icons.pets_outlined},
       {"title": "Bantuan", "icon": Icons.help_outline},
       {"title": "Tentang Aplikasi", "icon": Icons.info_outline},
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F4F8), 
+      backgroundColor: const Color(0xFFF0F4F8),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70),
         child: AppBar(
@@ -36,7 +37,7 @@ class BerandaPage extends StatelessWidget {
           flexibleSpace: Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF6A1B9A), Color(0xFF42A5F5)], 
+                colors: [Color(0xFF6A1B9A), Color(0xFF42A5F5)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -126,7 +127,7 @@ class BerandaPage extends StatelessWidget {
                     ),
                     leading: Icon(
                       item["icon"] as IconData,
-                      color: const Color(0xFF6A1B9A), 
+                      color: const Color(0xFF6A1B9A),
                       size: 26,
                     ),
                     title: Text(
@@ -150,11 +151,18 @@ class BerandaPage extends StatelessWidget {
                             builder: (context) => const ProfilePage(),
                           ),
                         );
+                      } else if (item["title"] == "Pet Food") {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PetFood(), // Mengubah PetFoodPage menjadi PetFood
+                          ),
+                        );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text("Kamu memilih: ${item["title"]}"),
-                            backgroundColor: const Color(0xFF42A5F5), 
+                            backgroundColor: const Color(0xFF42A5F5),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
