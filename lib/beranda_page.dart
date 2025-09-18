@@ -24,6 +24,10 @@ class BerandaPage extends StatelessWidget {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70),
         child: AppBar(
+          leading: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Image.asset('assets/images/logo1.png', fit: BoxFit.contain),
+          ),
           title: const Text(
             'Beranda',
             style: TextStyle(
@@ -155,7 +159,8 @@ class BerandaPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const PetFood(), // Mengubah PetFoodPage menjadi PetFood
+                            builder: (context) =>
+                                const PetFood(), // Mengubah PetFoodPage menjadi PetFood
                           ),
                         );
                       } else {

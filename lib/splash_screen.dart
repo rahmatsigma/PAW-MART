@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:myapp/login.dart'; 
+import 'package:myapp/login.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -22,48 +22,39 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2500), 
+      duration: const Duration(milliseconds: 2500),
     );
 
-    
-    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.elasticOut, 
-      ),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.5,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
 
-    
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.0, 0.7, curve: Curves.easeIn), 
+        curve: const Interval(0.0, 0.7, curve: Curves.easeIn),
       ),
     );
-    
-    
+
     _textFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.6, 1.0, curve: Curves.easeIn), 
+        curve: const Interval(0.6, 1.0, curve: Curves.easeIn),
       ),
     );
 
-    
     _controller.forward();
 
-    
     Timer(const Duration(seconds: 4), () {
       Navigator.pushReplacement(
         context,
-        
+
         PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => const LoginPage(),
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              const LoginPage(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
+            return FadeTransition(opacity: animation, child: child);
           },
           transitionDuration: const Duration(milliseconds: 800),
         ),
@@ -79,9 +70,8 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    
     final Color primaryColor = const Color(0xFF4A90E2);
-    
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -98,39 +88,18 @@ class _SplashScreenState extends State<SplashScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              
               FadeTransition(
                 opacity: _fadeAnimation,
                 child: ScaleTransition(
                   scale: _scaleAnimation,
                   child: Image.asset(
-                    'assets/images/logo.png',
-                    width: 150,
-                    height: 150,
+                    'assets/images/logo2.png',
+                    width: 500,
+                    height: 500,
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
-              
-              FadeTransition(
-                opacity: _textFadeAnimation,
-                child: const Text(
-                  'MY MIEE AYAAMM', 
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    letterSpacing: 1.5,
-                    shadows: [
-                      Shadow(
-                        blurRadius: 10.0,
-                        color: Colors.black26,
-                        offset: Offset(2.0, 2.0),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              const SizedBox(height: 16), // Kurangi jarak dari 32 menjadi 16
             ],
           ),
         ),
@@ -138,3 +107,4 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 }
+  

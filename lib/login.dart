@@ -14,14 +14,12 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
-  
   final Color primaryColor = const Color(0xFF4A90E2);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -34,10 +32,13 @@ class _LoginPageState extends State<LoginPage> {
         ),
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 48.0,
+            ),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 400),
-              
+
               child: Container(
                 padding: const EdgeInsets.all(24.0),
                 decoration: BoxDecoration(
@@ -54,11 +55,10 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    
                     Image.asset(
-                      'assets/images/logo.png', 
-                      width: 80,
-                      height: 80,
+                      'assets/images/logo.png',
+                      width: 150, 
+                      height: 150, 
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -71,16 +71,12 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'MIEEE AYAAMM SERIBU TOPING',
+                      'DI PAW MART',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                     ),
                     const SizedBox(height: 32),
 
-                    
                     _buildTextField(
                       controller: _emailController,
                       labelText: 'Email',
@@ -100,7 +96,6 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 32),
 
-                    
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -117,13 +112,15 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         child: const Text(
                           'Login',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(height: 24),
 
-                    
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -161,7 +158,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  
   Widget _buildTextField({
     required TextEditingController controller,
     required String labelText,
@@ -192,7 +188,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  
   Widget _buildPasswordField({
     required TextEditingController controller,
     required String labelText,
@@ -207,7 +202,9 @@ class _LoginPageState extends State<LoginPage> {
         prefixIcon: Icon(Icons.lock_outline, color: primaryColor),
         suffixIcon: IconButton(
           icon: Icon(
-            isObscured ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+            isObscured
+                ? Icons.visibility_off_outlined
+                : Icons.visibility_outlined,
             color: Colors.grey,
           ),
           onPressed: onToggleVisibility,
@@ -229,8 +226,7 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-  
-  
+
   void _handleLogin() {
     const accounts = [
       {'email': 'user@example.com', 'password': 'password123'},
@@ -248,9 +244,7 @@ class _LoginPageState extends State<LoginPage> {
     if (found) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => BerandaPage(email: inputEmail),
-        ),
+        MaterialPageRoute(builder: (context) => BerandaPage(email: inputEmail)),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
