@@ -67,7 +67,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Isi data di bawah untuk membeli MIEE AYAMMM!',
+                      'Isi data di bawah untuk membuat akun baru',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,

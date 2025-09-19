@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'pet_food.dart';
 import 'package:myapp/profile.dart';
 import 'package:myapp/login.dart';
+import 'package:myapp/setting.dart';
 
 class BerandaPage extends StatelessWidget {
   final String email;
@@ -13,7 +14,6 @@ class BerandaPage extends StatelessWidget {
     final items = [
       {"title": "Profile", "icon": Icons.person_outline},
       {"title": "Pengaturan", "icon": Icons.settings_outlined},
-      {"title": "Notifikasi", "icon": Icons.notifications_outlined},
       {"title": "Pet Food", "icon": Icons.pets_outlined},
       {"title": "Bantuan", "icon": Icons.help_outline},
       {"title": "Tentang Aplikasi", "icon": Icons.info_outline},
@@ -23,11 +23,7 @@ class BerandaPage extends StatelessWidget {
       backgroundColor: const Color(0xFFF0F4F8),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70),
-        child: AppBar(
-          leading: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Image.asset('assets/images/logo1.png', fit: BoxFit.contain),
-          ),
+        child: AppBar(                  
           title: const Text(
             'Beranda',
             style: TextStyle(
@@ -159,8 +155,14 @@ class BerandaPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                const PetFood(), // Mengubah PetFoodPage menjadi PetFood
+                            builder: (context) => const PetFood(),
+                          ),
+                        );
+                      } else if (item["title"] == "Pengaturan") {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SettingsPage(),
                           ),
                         );
                       } else {
