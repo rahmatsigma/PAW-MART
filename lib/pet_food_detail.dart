@@ -4,7 +4,7 @@ import 'models/pet_food_model.dart';
 class PetFoodDetail extends StatelessWidget {
   final PetFoodModel petFood;
 
-  const PetFoodDetail({Key? key, required this.petFood}) : super(key: key);
+  const PetFoodDetail({super.key, required this.petFood});
 
   @override
   Widget build(BuildContext context) {

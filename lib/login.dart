@@ -38,7 +38,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 400),
-
               child: Container(
                 padding: const EdgeInsets.all(24.0),
                 decoration: BoxDecoration(
@@ -57,8 +56,8 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     Image.asset(
                       'assets/images/logo.png',
-                      width: 150, 
-                      height: 150, 
+                      width: 150,
+                      height: 150,
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -76,7 +75,6 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                     ),
                     const SizedBox(height: 32),
-
                     _buildTextField(
                       controller: _emailController,
                       labelText: 'Email',
@@ -95,7 +93,6 @@ class _LoginPageState extends State<LoginPage> {
                       },
                     ),
                     const SizedBox(height: 32),
-
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -120,7 +117,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     const SizedBox(height: 24),
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -226,33 +222,34 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
-  void _handleLogin() {
-    const accounts = [
-      {'email': 'user@example.com', 'password': 'password123'},
-      {'email': 'admin@example.com', 'password': 'adminpass'},
-      {'email': 'riski@gmail.com', 'password': 'riski2341'},
-    ];
-
-    final inputEmail = _emailController.text;
-    final inputPassword = _passwordController.text;
-
-    final found = accounts.any(
-      (acc) => acc['email'] == inputEmail && acc['password'] == inputPassword,
-    );
-
-    if (found) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => BerandaPage(email: inputEmail)),
-      );
-    } else {
+  
+  void _handleLogin() {    
+    final inputEmail = _emailController.text.trim();
+    final inputPassword = _passwordController.text.trim();
+    
+    if (inputEmail.isEmpty || inputPassword.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Email atau password salah!'),
+          content: Text('Email dan password tidak boleh kosong!'),
+          backgroundColor: Color.fromARGB(255, 255, 64, 67),
+        ),
+      );
+      return; 
+    }
+    
+    if (!inputEmail.toLowerCase().endsWith('@gmail.com')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Format email harus menggunakan @gmail.com'),
           backgroundColor: Colors.redAccent,
         ),
       );
+      return; 
     }
+    
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => BerandaPage(email: inputEmail)),
+    );
   }
 }

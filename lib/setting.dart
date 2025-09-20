@@ -58,7 +58,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 _notificationsEnabled = value;
               });
             },
-            activeColor: const Color(0xFF6A55DF),
+            activeThumbColor: const Color(0xFF6A55DF),
           ),
           _buildSettingsListTile(
             icon: Icons.palette_outlined,

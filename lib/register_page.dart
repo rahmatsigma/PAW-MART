@@ -221,7 +221,7 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
           onPressed: onToggleVisibility,
         ),
-         border: OutlineInputBorder(
+        border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey.shade300),
         ),
