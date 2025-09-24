@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
-import 'models/pet_food_model.dart'; 
+import 'models/pet_food_model.dart';
 import 'models/pet_food_service.dart';
+import 'models/cart_service.dart';
 import 'pet_food_detail.dart';
+import 'cart_page.dart';
 
 class PetFood extends StatefulWidget {
-  const PetFood({super.key});
+  final String? initialCategory;
+
+  const PetFood({super.key, this.initialCategory});
 
   @override
   State<PetFood> createState() => _PetFoodListPageState();
@@ -19,6 +23,28 @@ class _PetFoodListPageState extends State<PetFood> {
   @override
   void initState() {
     super.initState();
+
+    if (widget.initialCategory != null) {
+      String filterValue;
+      switch (widget.initialCategory) {
+        case 'Anjing':
+          filterValue = 'dog';
+          break;
+        case 'Kucing':
+          filterValue = 'cat';
+          break;
+        case 'Burung':
+          filterValue = 'bird';
+          break;
+        case 'Ikan':
+          filterValue = 'fish';
+          break;
+        default:
+          filterValue = 'all';
+      }
+      selectedFilter = filterValue;
+    }
+
     loadPetFoods();
     searchController.addListener(_onSearchChanged);
   }
@@ -33,7 +59,13 @@ class _PetFoodListPageState extends State<PetFood> {
   void loadPetFoods() {
     setState(() {
       petFoodItems = PetFoodService.getAllPetFoods();
-      filteredPetFoodItems = petFoodItems;
+      if (selectedFilter == 'all') {
+        filteredPetFoodItems = petFoodItems;
+      } else {
+        filteredPetFoodItems = PetFoodService.getPetFoodByAnimalType(
+          selectedFilter,
+        );
+      }
     });
   }
 
@@ -54,11 +86,18 @@ class _PetFoodListPageState extends State<PetFood> {
       if (animalType == 'all') {
         filteredPetFoodItems = petFoodItems;
       } else {
-        filteredPetFoodItems = PetFoodService.getPetFoodByAnimalType(animalType);
+        filteredPetFoodItems = PetFoodService.getPetFoodByAnimalType(
+          animalType,
+        );
       }
       if (searchController.text.isNotEmpty) {
-        filteredPetFoodItems = filteredPetFoodItems.where((item) =>
-            item.name.toLowerCase().contains(searchController.text.toLowerCase())).toList();
+        filteredPetFoodItems = filteredPetFoodItems
+            .where(
+              (item) => item.name.toLowerCase().contains(
+                    searchController.text.toLowerCase(),
+                  ),
+            )
+            .toList();
       }
     });
   }
@@ -68,12 +107,25 @@ class _PetFoodListPageState extends State<PetFood> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
+        iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           'Pet Food Store',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: const Color(0xFF2196F3),
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.shopping_cart_outlined, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CartPage()),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: Column(
         children: [
@@ -94,7 +146,6 @@ class _PetFoodListPageState extends State<PetFood> {
               ),
             ),
           ),
-
           SizedBox(
             height: 50,
             child: ListView(
@@ -105,12 +156,11 @@ class _PetFoodListPageState extends State<PetFood> {
                 _buildFilterButton('dog', 'Anjing'),
                 _buildFilterButton('cat', 'Kucing'),
                 _buildFilterButton('bird', 'Burung'),
+                _buildFilterButton('fish', 'Ikan'),
               ],
             ),
           ),
-
           const SizedBox(height: 16),
-
           Expanded(
             child: filteredPetFoodItems.isEmpty
                 ? const Center(
@@ -159,7 +209,7 @@ class _PetFoodListPageState extends State<PetFood> {
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      clipBehavior: Clip.antiAlias, 
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () {
           Navigator.push(
@@ -173,53 +223,109 @@ class _PetFoodListPageState extends State<PetFood> {
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              SizedBox(
-                width: 80,
-                height: 80,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    petFood.imageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: Colors.grey.shade200,
-                        child: const Icon(Icons.pets, size: 40, color: Colors.grey),
-                      );
-                    },
-                  ),
+              Expanded(
+                flex: 3,
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 120,
+                      height: 120,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          petFood.imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: Colors.grey.shade200,
+                              child: const Icon(Icons.pets, size: 40, color: Colors.grey),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            petFood.name,
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${petFood.brand} • ${petFood.formattedWeight}',
+                            style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            petFood.formattedPrice,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF4CAF50),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
+              const SizedBox(width: 16),
+              SizedBox(
+                width: 100,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      petFood.name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                    ElevatedButton(
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Fitur ini belum diimplementasikan'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                        minimumSize: const Size(80, 30),
+                        textStyle: const TextStyle(fontSize: 13),
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                      child: const Text('Beli'),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      '${petFood.brand} • ${petFood.formattedWeight}',
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 12,
+                    OutlinedButton(
+                      onPressed: () {
+                        CartService.addItemFromPetFood(petFood);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('${petFood.name} ditambahkan'),
+                            duration: const Duration(seconds: 2),
+                            action: SnackBarAction(
+                              label: 'LIHAT',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const CartPage()),
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.blue,
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                        minimumSize: const Size(80, 30),
+                        textStyle: const TextStyle(fontSize: 13),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      petFood.formattedPrice,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF4CAF50),
-                      ),
+                      child: const Text('+ Keranjang'),
                     ),
                   ],
                 ),

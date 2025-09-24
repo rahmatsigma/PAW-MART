@@ -82,6 +82,31 @@ class PetFoodService {
         ageGroup: 'senior',
         specialFeatures: ['Antioxidants', 'Joint Support'],
       ),
+
+      PetFoodModel(
+        id: 7,
+        name: 'TetraMin Tropical Flakes',
+        brand: 'Tetra',
+        category: 'Flakes',
+        price: 55000,
+        imageUrl: 'assets/images/tetramin.jpg', 
+        description: 'Makanan ikan tropis harian dalam bentuk serpihan untuk meningkatkan warna dan vitalitas.',
+        weight: 0.1, 
+        stock: 40,
+        animalType: 'fish',
+      ),
+      PetFoodModel(
+        id: 8,
+        name: 'Hikari Goldfish Gold',
+        brand: 'Hikari',
+        category: 'Pellets',
+        price: 95000,
+        imageUrl: 'assets/images/hikari.jpg', 
+        description: 'Pelet premium mengapung untuk meningkatkan pertumbuhan dan warna pada ikan koki.',
+        weight: 0.2, 
+        stock: 22,
+        animalType: 'fish',
+      ),
     ];
   }
 
