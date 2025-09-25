@@ -67,7 +67,6 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // TODO: Tambahkan logika pembayaran / konfirmasi pesanan
                   showDialog(
                     context: context,
                     builder: (_) => AlertDialog(
@@ -77,8 +76,8 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
                         TextButton(
                           onPressed: () {
                             Navigator.of(context).pop();
-                            Navigator.of(context).pop(); // kembali ke halaman sebelumnya
-                            CartService.clearCart(); // opsional, kosongkan keranjang setelah checkout
+                            Navigator.of(context).pop(); 
+                            CartService.clearCart(); 
                           },
                           child: const Text('OK'),
                         )
@@ -86,11 +85,11 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
                     ),
                   );
                 },
-                child: const Text('Konfirmasi & Bayar'),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
+                child: const Text('Konfirmasi & Bayar'),
               ),
             )
           ],

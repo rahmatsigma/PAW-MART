@@ -1,5 +1,4 @@
 import 'package:myapp/models/pet_food_model.dart';
-import 'package:myapp/pet_food.dart';
 
 import 'cart_item_model.dart';
 
