@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'pet_food.dart';
-import 'package:myapp/login.dart';
-import 'package:myapp/setting.dart';
-import 'package:myapp/about.dart';
+import 'login.dart';
+import 'setting.dart';
+import 'about.dart';
 import 'cart_page.dart';
+import 'order_history.dart'; 
 
 class NavTextButton extends StatelessWidget {
   final String text;
@@ -29,15 +30,12 @@ class BerandaPage extends StatelessWidget {
   final String email;
   const BerandaPage({super.key, required this.email});
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildProfileMenu(BuildContext context) {
     void showLogoutDialog() {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           title: const Text('Konfirmasi Logout'),
           content: const Text('Apakah Anda yakin ingin keluar?'),
           actions: [
@@ -61,6 +59,53 @@ class BerandaPage extends StatelessWidget {
       );
     }
 
+    return PopupMenuButton<String>(
+      offset: const Offset(0, 40),
+      icon: Icon(Icons.person_outline, color: Colors.grey[800]),
+      onSelected: (value) {
+        if (value == 'riwayat') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const OrderHistoryPage()),
+          );
+        } else if (value == 'pengaturan') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const SettingsPage()),
+          );
+        } else if (value == 'logout') {
+          showLogoutDialog();
+        }
+      },
+      itemBuilder: (context) => [
+        const PopupMenuItem(
+          value: 'riwayat',
+          child: ListTile(
+            leading: Icon(Icons.history_outlined),
+            title: Text('Riwayat Pesanan'),
+          ),
+        ),
+        const PopupMenuItem(
+          value: 'pengaturan',
+          child: ListTile(
+            leading: Icon(Icons.settings_outlined),
+            title: Text('Pengaturan'),
+          ),
+        ),
+        const PopupMenuDivider(),
+        const PopupMenuItem(
+          value: 'logout',
+          child: ListTile(
+            leading: Icon(Icons.logout),
+            title: Text('Logout'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final bool isMobile = screenWidth < 768;
     return Scaffold(
@@ -72,13 +117,7 @@ class BerandaPage extends StatelessWidget {
                 children: [
                   const DrawerHeader(
                     decoration: BoxDecoration(color: Color(0xFFF0F4F8)),
-                    child: Text(
-                      'Menu',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    child: Text('Menu', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                   ),
                   ListTile(title: const Text('Home'), onTap: () {}),
                   ListTile(
@@ -86,9 +125,7 @@ class BerandaPage extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const PetFood(),
-                        ),
+                        MaterialPageRoute(builder: (context) => const PetFood()),
                       );
                     },
                   ),
@@ -97,9 +134,7 @@ class BerandaPage extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const AboutPage(),
-                        ),
+                        MaterialPageRoute(builder: (context) => const AboutPage()),
                       );
                     },
                   ),
@@ -116,14 +151,10 @@ class BerandaPage extends StatelessWidget {
         ),
         title: const Text(
           'Paw Mart',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 22,
-          ),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22),
         ),
         actions: !isMobile
-            ? [
+            ? [ 
                 NavTextButton(text: "Home", onPressed: () {}),
                 const SizedBox(width: 15),
                 NavTextButton(
@@ -141,18 +172,13 @@ class BerandaPage extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => const AboutPage(),
-                      ),
+                      MaterialPageRoute(builder: (context) => const AboutPage()),
                     );
                   },
                 ),
                 const SizedBox(width: 30),
                 IconButton(
-                  icon: Icon(
-                    Icons.shopping_cart_outlined,
-                    color: Colors.grey[800],
-                  ),
+                  icon: Icon(Icons.shopping_cart_outlined, color: Colors.grey[800]),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -161,47 +187,12 @@ class BerandaPage extends StatelessWidget {
                   },
                 ),
                 const SizedBox(width: 10),
-                PopupMenuButton<String>(
-                  offset: const Offset(0, 40),
-                  icon: Icon(Icons.person_outline, color: Colors.grey[800]),
-                  onSelected: (value) {
-                    if (value == 'pengaturan') {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SettingsPage(),
-                        ),
-                      );
-                    } else if (value == 'logout') {
-                      showLogoutDialog();
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'pengaturan',
-                      child: ListTile(
-                        leading: Icon(Icons.settings_outlined),
-                        title: Text('Pengaturan'),
-                      ),
-                    ),
-                    const PopupMenuDivider(),
-                    const PopupMenuItem(
-                      value: 'logout',
-                      child: ListTile(
-                        leading: Icon(Icons.logout),
-                        title: Text('Logout'),
-                      ),
-                    ),
-                  ],
-                ),
+                _buildProfileMenu(context),
                 const SizedBox(width: 20),
               ]
-            : [
+            : [ 
                 IconButton(
-                  icon: Icon(
-                    Icons.shopping_cart_outlined,
-                    color: Colors.grey[800],
-                  ),
+                  icon: Icon(Icons.shopping_cart_outlined, color: Colors.grey[800]),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -209,20 +200,14 @@ class BerandaPage extends StatelessWidget {
                     );
                   },
                 ),
-                IconButton(
-                  icon: Icon(Icons.person_outline, color: Colors.grey[800]),
-                  onPressed: () {},
-                ),
+                _buildProfileMenu(context),
               ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             _buildHeroSection(context, isMobile, email),
-            _buildCategorySection(
-              context,
-              isMobile,
-            ), 
+            _buildCategorySection(context, isMobile),
           ],
         ),
       ),
@@ -231,9 +216,7 @@ class BerandaPage extends StatelessWidget {
 
   Widget _buildHeroSection(BuildContext context, bool isMobile, String email) {
     final textContent = Column(
-      crossAxisAlignment: isMobile
-          ? CrossAxisAlignment.center
-          : CrossAxisAlignment.start,
+      crossAxisAlignment: isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
       children: [
         RichText(
           textAlign: isMobile ? TextAlign.center : TextAlign.start,
@@ -258,11 +241,7 @@ class BerandaPage extends StatelessWidget {
         Text(
           'Discover high-quality pet food that keeps your companions healthy and happy. Natural ingredients, scientifically formulated.',
           textAlign: isMobile ? TextAlign.center : TextAlign.start,
-          style: const TextStyle(
-            fontSize: 16,
-            color: Colors.black54,
-            height: 1.5,
-          ),
+          style: const TextStyle(fontSize: 16, color: Colors.black54, height: 1.5),
         ),
         const SizedBox(height: 32),
         Wrap(
@@ -279,35 +258,19 @@ class BerandaPage extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue.shade600,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 20,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              child: const Text(
-                'Shop Now',
-                style: TextStyle(fontSize: 16, color: Colors.white),
-              ),
+              child: const Text('Shop Now', style: TextStyle(fontSize: 16, color: Colors.white)),
             ),
             OutlinedButton(
               onPressed: () {},
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 20,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 side: BorderSide(color: Colors.grey.shade300),
               ),
-              child: const Text(
-                'Learn More',
-                style: TextStyle(fontSize: 16, color: Colors.black87),
-              ),
+              child: const Text('Learn More', style: TextStyle(fontSize: 16, color: Colors.black87)),
             ),
           ],
         ),
@@ -338,22 +301,13 @@ class BerandaPage extends StatelessWidget {
 
     return Container(
       color: const Color(0xFFF0F4F8),
-      padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 24 : 60,
-        vertical: 40,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 24 : 60, vertical: 40),
       child: Column(
-        crossAxisAlignment: isMobile
-            ? CrossAxisAlignment.center
-            : CrossAxisAlignment.start,
+        crossAxisAlignment: isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
         children: [
           Text(
             'Selamat datang $email ',
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF333333),
-            ),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Color(0xFF333333)),
           ),
           const SizedBox(height: 40),
           isMobile
@@ -419,52 +373,33 @@ class BerandaPage extends StatelessWidget {
 
     return Container(
       color: Colors.white,
-      padding: EdgeInsets.symmetric(
-        vertical: 80,
-        horizontal: isMobile ? 24 : 60,
-      ),
+      padding: EdgeInsets.symmetric(vertical: 80, horizontal: isMobile ? 24 : 60),
       child: Column(
         children: [
           const Text(
-                'Shop by Category',
-                style: TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1F2937),
-                ),
-              )
-              .animate()
-              .fadeIn(delay: 200.ms, duration: 500.ms)
-              .slideY(begin: 0.5),
+            'Shop by Category',
+            style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: Color(0xFF1F2937)),
+          ).animate().fadeIn(delay: 200.ms, duration: 500.ms).slideY(begin: 0.5),
           const SizedBox(height: 16),
           const Text(
-                'Find the perfect food for your pet’s needs',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18, color: Colors.black54),
-              )
-              .animate()
-              .fadeIn(delay: 300.ms, duration: 500.ms)
-              .slideY(begin: 0.5),
+            'Find the perfect food for your pet’s needs',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 18, color: Colors.black54),
+          ).animate().fadeIn(delay: 300.ms, duration: 500.ms).slideY(begin: 0.5),
           const SizedBox(height: 40),
           isMobile
               ? Wrap(
                   spacing: 24,
                   runSpacing: 24,
                   alignment: WrapAlignment.center,
-                  children: categoryCards
-                      .animate(interval: 80.ms)
-                      .fadeIn(duration: 400.ms)
-                      .moveY(begin: 20),
+                  children: categoryCards.animate(interval: 80.ms).fadeIn(duration: 400.ms).moveY(begin: 20),
                 )
               : Center(
                   child: Container(
                     constraints: const BoxConstraints(maxWidth: 1000),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: categoryCards
-                          .animate(interval: 100.ms)
-                          .fadeIn(duration: 500.ms)
-                          .slideX(begin: -0.5),
+                      children: categoryCards.animate(interval: 100.ms).fadeIn(duration: 500.ms).slideX(begin: -0.5),
                     ),
                   ),
                 ),
@@ -477,13 +412,13 @@ class BerandaPage extends StatelessWidget {
 class CategoryCard extends StatelessWidget {
   final IconData icon;
   final String label;
-  final VoidCallback? onTap; 
+  final VoidCallback? onTap;
 
   const CategoryCard({
     super.key,
     required this.icon,
     required this.label,
-    this.onTap, 
+    this.onTap,
   });
 
   @override
