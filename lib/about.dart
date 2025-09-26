@@ -3,7 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
-
+  
   Future<void> _launchURL(String url) async {
     final Uri uri = Uri.parse(url);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
@@ -16,7 +16,7 @@ class AboutPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tentang Aplikasi'),
-        backgroundColor: const Color(0xFF2196F3), // Warna yang konsisten
+        backgroundColor: const Color(0xFF2196F3), 
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -81,7 +81,7 @@ class AboutPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Riski Rahmattilah Pratama', 
+              'Riski Rahmattilah Pratama',
               style: Theme.of(
                 context,
               ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
