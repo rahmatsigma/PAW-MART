@@ -4,6 +4,7 @@ import 'models/pet_food_service.dart';
 import 'models/cart_service.dart';
 import 'pet_food_detail.dart';
 import 'cart_page.dart';
+import 'order_confirmation.dart';
 
 class PetFood extends StatefulWidget {
   final String? initialCategory;
@@ -94,8 +95,8 @@ class _PetFoodListPageState extends State<PetFood> {
         filteredPetFoodItems = filteredPetFoodItems
             .where(
               (item) => item.name.toLowerCase().contains(
-                    searchController.text.toLowerCase(),
-                  ),
+                searchController.text.toLowerCase(),
+              ),
             )
             .toList();
       }
@@ -238,7 +239,11 @@ class _PetFoodListPageState extends State<PetFood> {
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
                               color: Colors.grey.shade200,
-                              child: const Icon(Icons.pets, size: 40, color: Colors.grey),
+                              child: const Icon(
+                                Icons.pets,
+                                size: 40,
+                                color: Colors.grey,
+                              ),
                             );
                           },
                         ),
@@ -251,14 +256,20 @@ class _PetFoodListPageState extends State<PetFood> {
                         children: [
                           Text(
                             petFood.name,
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 4),
                           Text(
                             '${petFood.brand} • ${petFood.formattedWeight}',
-                            style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 12,
+                            ),
                           ),
                           const SizedBox(height: 8),
                           Text(
@@ -283,17 +294,21 @@ class _PetFoodListPageState extends State<PetFood> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Fitur ini belum diimplementasikan'),
-                            duration: Duration(seconds: 2),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                OrderConfirmationPage(singleItem: petFood),
                           ),
                         );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 0,
+                        ),
                         minimumSize: const Size(80, 30),
                         textStyle: const TextStyle(fontSize: 13),
                       ),
@@ -312,7 +327,9 @@ class _PetFoodListPageState extends State<PetFood> {
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => const CartPage()),
+                                  MaterialPageRoute(
+                                    builder: (context) => const CartPage(),
+                                  ),
                                 );
                               },
                             ),
@@ -321,7 +338,10 @@ class _PetFoodListPageState extends State<PetFood> {
                       },
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.blue,
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 0,
+                        ),
                         minimumSize: const Size(80, 30),
                         textStyle: const TextStyle(fontSize: 13),
                       ),
