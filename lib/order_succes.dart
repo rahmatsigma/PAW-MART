@@ -19,9 +19,19 @@ class OrderSuccessPage extends StatelessWidget {
     final formatCurrency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
-        title: const Text('Status Pesanan'),
-        automaticallyImplyLeading: false, 
+        title: const Text(
+          'Status Pesanan',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        iconTheme: const IconThemeData(color: Colors.black87),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -42,19 +52,37 @@ class OrderSuccessPage extends StatelessWidget {
   }
 
   Widget _buildSuccessHeader() {
-    return const Column(
+    return Column(
       children: [
-        Icon(Icons.check_circle_outline, color: Colors.green, size: 80),
-        SizedBox(height: 16),
-        Text(
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.green.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.check_circle_outline,
+            color: Colors.green,
+            size: 80,
+          ),
+        ),
+        const SizedBox(height: 16),
+        const Text(
           'Pesanan Berhasil Dibuat!',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
           textAlign: TextAlign.center,
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Text(
           'Terima kasih! Kami akan segera memproses pesanan Anda.',
-          style: TextStyle(fontSize: 16, color: Colors.black54),
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[600],
+          ),
           textAlign: TextAlign.center,
         ),
       ],
@@ -62,35 +90,59 @@ class OrderSuccessPage extends StatelessWidget {
   }
 
   Widget _buildOrderDetailCard(String orderId, NumberFormat formatCurrency) {
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('DETAIL PESANAN', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54)),
-            const Divider(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('ID Pesanan:'),
-                Text(orderId, style: const TextStyle(fontWeight: FontWeight.bold)),
-              ],
+            Text(
+              'DETAIL PESANAN',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[600],
+                fontSize: 12,
+                letterSpacing: 0.5,
+              ),
             ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Tanggal Pesanan:'),
-                Text(DateFormat('dd MMMM yyyy, HH:mm').format(DateTime.now()), style: const TextStyle(fontWeight: FontWeight.bold)),
-              ],
+            Divider(height: 20, color: Colors.grey[300]),
+            _buildDetailRow('ID Pesanan:', orderId),
+            const SizedBox(height: 12),
+            _buildDetailRow(
+              'Tanggal Pesanan:',
+              DateFormat('dd MMMM yyyy, HH:mm').format(DateTime.now()),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Total Pembayaran:'),
-                Text(formatCurrency.format(totalAmount), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.deepPurple)),
+                Text(
+                  'Total Pembayaran:',
+                  style: TextStyle(
+                    color: Colors.grey[700],
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  formatCurrency.format(totalAmount),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.blue[700],
+                  ),
+                ),
               ],
             ),
           ],
@@ -99,39 +151,130 @@ class OrderSuccessPage extends StatelessWidget {
     );
   }
 
+  Widget _buildDetailRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.grey[700],
+            fontSize: 14,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              color: Colors.black87,
+            ),
+            textAlign: TextAlign.right,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildProductListCard(NumberFormat formatCurrency) {
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('PRODUK YANG DIPESAN', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54)),
-            const Divider(height: 20),
-            ListView.builder(
+            Text(
+              'PRODUK YANG DIPESAN',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[600],
+                fontSize: 12,
+                letterSpacing: 0.5,
+              ),
+            ),
+            Divider(height: 20, color: Colors.grey[300]),
+            ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: orderedItems.length,
+              separatorBuilder: (context, index) => Divider(
+                height: 20,
+                color: Colors.grey[200],
+              ),
               itemBuilder: (context, index) {
                 final item = orderedItems[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Row(
-                    children: [
-                      Image.network(item.food.imageUrl, width: 50, height: 50, fit: BoxFit.cover),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(item.food.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                            Text('Jumlah: ${item.quantity}'),
-                          ],
-                        ),
+                return Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        item.food.imageUrl,
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 60,
+                            height: 60,
+                            color: Colors.grey[200],
+                            child: Icon(
+                              Icons.pets,
+                              color: Colors.grey[400],
+                            ),
+                          );
+                        },
                       ),
-                      Text(formatCurrency.format(item.food.price * item.quantity)),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.food.name,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: Colors.black87,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Jumlah: ${item.quantity}',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      formatCurrency.format(item.food.price * item.quantity),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: Colors.blue[700],
+                      ),
+                    ),
+                  ],
                 );
               },
             ),
@@ -142,8 +285,18 @@ class OrderSuccessPage extends StatelessWidget {
   }
 
   Widget _buildBottomButton(BuildContext context) {
-    return Padding(
+    return Container(
       padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
@@ -151,10 +304,17 @@ class OrderSuccessPage extends StatelessWidget {
             Navigator.of(context).popUntil((route) => route.isFirst);
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.deepPurple,
+            backgroundColor: Colors.blue[700],
             foregroundColor: Colors.white,
+            elevation: 0,
             padding: const EdgeInsets.symmetric(vertical: 16),
-            textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            textStyle: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           child: const Text('Kembali ke Beranda'),
         ),

@@ -34,8 +34,20 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
   }
 
   Widget _buildAddressCard() {
-    return Card(
+    return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -43,27 +55,38 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
           children: [
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.location_on_outlined,
-                  color: Colors.deepPurple,
+                  color: Colors.blue[700],
+                  size: 24,
                 ),
                 const SizedBox(width: 8),
-                Text(
+                const Text(
                   'Alamat Pengiriman',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
             const Text(
               'Riski RahmatSigma (+62) 812-3456-7890',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+                color: Colors.black87,
+              ),
             ),
-            const Text(
+            const SizedBox(height: 4),
+            Text(
               'Jl. Pahlawan No. 123, Madiun, Jawa Timur, 63117',
-              style: TextStyle(color: Colors.black54),
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
             ),
           ],
         ),
@@ -72,48 +95,117 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
   }
 
   Widget _buildProductList() {
-    return Card(
+    return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(
+            const Padding(
+              padding: EdgeInsets.symmetric(
                 horizontal: 16.0,
                 vertical: 8.0,
               ),
               child: Text(
                 'Rincian Produk',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
               ),
             ),
-            const Divider(),
+            Divider(height: 1, color: Colors.grey[200]),
             ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: _items.length,
               itemBuilder: (context, index) {
                 final item = _items[index];
-                return ListTile(
-                  leading: Image.network(
-                    item.food.imageUrl,
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 12.0,
                   ),
-                  title: Text(item.food.name),
-                  subtitle: Text('Jumlah: ${item.quantity}'),
-                  trailing: Text(
-                    formatCurrency.format(item.food.price * item.quantity),
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          item.food.imageUrl,
+                          width: 60,
+                          height: 60,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: 60,
+                              height: 60,
+                              color: Colors.grey[200],
+                              child: Icon(
+                                Icons.pets,
+                                color: Colors.grey[400],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.food.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: Colors.black87,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Jumlah: ${item.quantity}',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        formatCurrency.format(item.food.price * item.quantity),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: Colors.blue[700],
+                        ),
+                      ),
+                    ],
                   ),
                 );
               },
-              separatorBuilder: (context, index) =>
-                  const Divider(indent: 16, endIndent: 16),
+              separatorBuilder: (context, index) => Divider(
+                height: 1,
+                color: Colors.grey[200],
+                indent: 16,
+                endIndent: 16,
+              ),
             ),
           ],
         ),
@@ -122,16 +214,39 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
   }
 
   Widget _buildPaymentMethod() {
-    return Card(
+    return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: ListTile(
-        leading: const Icon(Icons.payment_outlined, color: Colors.deepPurple),
-        title: const Text('Metode Pembayaran'),
-        subtitle: const Text(
-          'Pilih Metode Pembayaran',
-          style: TextStyle(color: Colors.black54),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        leading: Icon(Icons.payment_outlined, color: Colors.blue[700], size: 24),
+        title: const Text(
+          'Metode Pembayaran',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+            color: Colors.black87,
+          ),
         ),
-        trailing: const Icon(Icons.chevron_right),
+        subtitle: Text(
+          'Pilih Metode Pembayaran',
+          style: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 13,
+          ),
+        ),
+        trailing: Icon(Icons.chevron_right, color: Colors.grey[400]),
         onTap: () {},
       ),
     );
@@ -141,49 +256,91 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
     const double shippingCost = 15000;
     final double total = subtotal + shippingCost;
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Rincian Pembayaran',
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
             ),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Subtotal Produk'),
-                Text(formatCurrency.format(subtotal)),
+                Text(
+                  'Subtotal Produk',
+                  style: TextStyle(
+                    color: Colors.grey[700],
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  formatCurrency.format(subtotal),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.black87,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Biaya Pengiriman'),
-                Text(formatCurrency.format(shippingCost)),
+                Text(
+                  'Biaya Pengiriman',
+                  style: TextStyle(
+                    color: Colors.grey[700],
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  formatCurrency.format(shippingCost),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.black87,
+                  ),
+                ),
               ],
             ),
-            const Divider(height: 24),
+            Divider(height: 24, color: Colors.grey[300]),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
                   'Total Pembayaran',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.black87,
+                  ),
                 ),
                 Text(
                   formatCurrency.format(total),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
-                    color: Colors.deepPurple,
+                    color: Colors.blue[700],
                   ),
                 ),
               ],
@@ -204,15 +361,22 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
     final double total = subtotal + shippingCost;
 
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
-        title: const Text('Checkout'),
+        title: const Text(
+          'Checkout',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
         backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 1,
+        foregroundColor: Colors.black87,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black87),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -225,14 +389,14 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
         ),
       ),
       bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: const BoxDecoration(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black12,
+              color: Colors.grey.withOpacity(0.2),
               blurRadius: 10,
-              offset: Offset(0, -2),
+              offset: const Offset(0, -2),
             ),
           ],
         ),
@@ -243,13 +407,19 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Total Pembayaran:'),
+                Text(
+                  'Total Pembayaran:',
+                  style: TextStyle(
+                    color: Colors.grey[700],
+                    fontSize: 13,
+                  ),
+                ),
                 Text(
                   formatCurrency.format(total),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
-                    color: Colors.deepPurple,
+                    color: Colors.blue[700],
                   ),
                 ),
               ],
@@ -273,11 +443,15 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
+                backgroundColor: Colors.blue[700],
                 foregroundColor: Colors.white,
+                elevation: 0,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
+                  horizontal: 32,
+                  vertical: 14,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 textStyle: const TextStyle(
                   fontSize: 16,
