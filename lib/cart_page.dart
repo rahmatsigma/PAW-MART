@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart'; 
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
-import 'package:myapp/order_confirmation.dart';
+import 'order_confirmation.dart';
+import 'order_succes.dart';
 import 'models/cart_item_model.dart';
 import 'models/cart_service.dart';
 
@@ -14,6 +15,7 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   List<CartItem> _cartItems = [];
+  final Set<CartItem> _selectedItems = {};
 
   @override
   void initState() {
@@ -24,6 +26,27 @@ class _CartPageState extends State<CartPage> {
   void _loadCartItems() {
     setState(() {
       _cartItems = CartService.getItems();
+      _selectedItems.removeWhere((item) => !_cartItems.contains(item));
+    });
+  }
+
+  void _onItemSelected(CartItem item, bool? isSelected) {
+    setState(() {
+      if (isSelected == true) {
+        _selectedItems.add(item);
+      } else {
+        _selectedItems.remove(item);
+      }
+    });
+  }
+
+  void _toggleSelectAll(bool? isSelected) {
+    setState(() {
+      if (isSelected == true) {
+        _selectedItems.addAll(_cartItems);
+      } else {
+        _selectedItems.clear();
+      }
     });
   }
 
@@ -31,6 +54,7 @@ class _CartPageState extends State<CartPage> {
     final int index = _cartItems.indexOf(item);
     setState(() {
       _cartItems.remove(item);
+      _selectedItems.remove(item);
     });
     CartService.removeItem(item);
     ScaffoldMessenger.of(context).showSnackBar(
@@ -49,8 +73,52 @@ class _CartPageState extends State<CartPage> {
     );
   }
 
+  void _checkoutSelectedItems() async {
+    if (_selectedItems.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Pilih setidaknya satu item untuk checkout.'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    final String orderId = 'INV-${DateFormat('ddMMyyyy-HHmm').format(DateTime.now())}';
+    final List<CartItem> itemsForSuccessPage = _selectedItems.toList();
+    const double shippingCost = 15000; 
+    final double totalAmount = itemsForSuccessPage.fold(0.0, (sum, item) => sum + (item.food.price * item.quantity)) + shippingCost;
+
+    final bool? checkoutSuccess = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => OrderConfirmationPage(
+          itemsToCheckout: _selectedItems.toList(),
+        ),
+      ),
+    );
+
+    if (checkoutSuccess == true && mounted) {
+      CartService.removeMultipleItems(_selectedItems.toList());
+      _loadCartItems();
+      
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => OrderSuccessPage(
+            orderedItems: itemsForSuccessPage,
+            totalAmount: totalAmount,
+            orderId: orderId,
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    bool isAllSelected = _cartItems.isNotEmpty && _selectedItems.length == _cartItems.length;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
@@ -67,13 +135,15 @@ class _CartPageState extends State<CartPage> {
           ? _buildEmptyCartView()
           : Column(
               children: [
+                _buildSelectAllHeader(isAllSelected),
                 Expanded(
                   child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     itemCount: _cartItems.length,
                     itemBuilder: (context, index) {
                       final item = _cartItems[index];
-                      return _buildCartItemCard(item)
+                      final bool isSelected = _selectedItems.contains(item);
+                      return _buildCartItemCard(item, isSelected)
                           .animate()
                           .fadeIn(duration: 400.ms)
                           .slideY(begin: 0.2, curve: Curves.easeInOut);
@@ -85,6 +155,22 @@ class _CartPageState extends State<CartPage> {
                     .slideY(begin: 1, duration: 300.ms, curve: Curves.easeOut),
               ],
             ),
+    );
+  }
+
+  Widget _buildSelectAllHeader(bool isAllSelected) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: Row(
+        children: [
+          Checkbox(
+            value: isAllSelected,
+            onChanged: _toggleSelectAll,
+            activeColor: Theme.of(context).primaryColor,
+          ),
+          const Text('Pilih Semua', style: TextStyle(fontWeight: FontWeight.w500)),
+        ],
+      ),
     );
   }
 
@@ -104,14 +190,14 @@ class _CartPageState extends State<CartPage> {
     ).animate().fade(duration: 500.ms);
   }
 
-  Widget _buildCartItemCard(CartItem item) {
+  Widget _buildCartItemCard(CartItem item, bool isSelected) {
     final formatCurrency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
 
     return Dismissible(
-      key: Key(item.food.id.toString()), 
-      direction: DismissDirection.endToStart, 
+      key: Key(item.food.id.toString()),
+      direction: DismissDirection.endToStart,
       onDismissed: (direction) {
-        _removeItem(item); 
+        _removeItem(item);
       },
       background: Container(
         decoration: BoxDecoration(
@@ -128,12 +214,17 @@ class _CartPageState extends State<CartPage> {
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
           child: Row(
             children: [
+              Checkbox(
+                value: isSelected,
+                onChanged: (bool? value) => _onItemSelected(item, value),
+                activeColor: Theme.of(context).primaryColor,
+              ),
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: Image.network(item.food.imageUrl, width: 80, height: 80, fit: BoxFit.cover),
+                child: Image.network(item.food.imageUrl, width: 70, height: 70, fit: BoxFit.cover),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -179,6 +270,9 @@ class _CartPageState extends State<CartPage> {
   }
 
   Widget _buildSummaryCard() {
+    final double totalPrice = _selectedItems.fold(0.0, (sum, item) => sum + (item.food.price * item.quantity));
+    final String formattedTotalPrice = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(totalPrice);
+    
     return Card(
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
       elevation: 4,
@@ -192,19 +286,18 @@ class _CartPageState extends State<CartPage> {
               children: [
                 const Text('Total Harga', style: TextStyle(color: Colors.grey)),
                 Text(
-                  CartService.getFormattedTotalPrice(),
+                  formattedTotalPrice,
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
               ],
             ),
             ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const OrderConfirmationPage()),
-                );
-              },
-              child: const Text('Checkout'),
+              onPressed: _checkoutSelectedItems,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              child: Text('Checkout (${_selectedItems.length})'),
             ),
           ],
         ),

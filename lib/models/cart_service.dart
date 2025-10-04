@@ -49,4 +49,6 @@ static void addItemFromPetFood(PetFoodModel petFood) {
     double total = _cartItems.fold(0, (sum, item) => sum + item.food.price * item.quantity);
     return 'Rp ${total.toStringAsFixed(0)}';
   }
+
+  static void removeMultipleItems(List<CartItem> list) {}
 }

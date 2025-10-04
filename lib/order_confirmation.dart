@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'models/cart_item_model.dart';
-import 'models/cart_service.dart';
 import 'models/pet_food_model.dart';
+import 'models/cart_service.dart'; // Add this import
 import 'order_succes.dart';
 
 class OrderConfirmationPage extends StatefulWidget {
-  final List<CartItem>? cartItems;
+  final List<CartItem>? itemsToCheckout;
   final PetFoodModel? singleItem;
 
-  const OrderConfirmationPage({super.key, this.cartItems, this.singleItem});
+  const OrderConfirmationPage({
+    super.key,
+    this.itemsToCheckout,
+    this.singleItem,
+  });
 
   @override
   State<OrderConfirmationPage> createState() => _OrderConfirmationPageState();
@@ -26,11 +30,122 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
   @override
   void initState() {
     super.initState();
-    if (widget.cartItems != null) {
-      _items = widget.cartItems!;
+    if (widget.itemsToCheckout != null) {
+      _items = widget.itemsToCheckout!;
     } else if (widget.singleItem != null) {
       _items = [CartItem(food: widget.singleItem!, quantity: 1)];
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double subtotal = _items.fold(
+      0,
+      (sum, item) => sum + (item.food.price * item.quantity),
+    );
+    const double shippingCost = 15000;
+    final double total = subtotal + shippingCost;
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
+      appBar: AppBar(
+        title: const Text(
+          'Checkout',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
+        ),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black87),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildAddressCard(),
+            _buildProductList(),
+            _buildPaymentMethod(),
+            _buildOrderSummary(subtotal),
+            const SizedBox(height: 80),
+          ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Total Pembayaran:',
+                  style: TextStyle(color: Colors.grey[700], fontSize: 13),
+                ),
+                Text(
+                  formatCurrency.format(total),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: Colors.blue[700],
+                  ),
+                ),
+              ],
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final String orderId =
+                    'INV-${DateFormat('ddMMyyyy-HHmm').format(DateTime.now())}';
+
+                if (widget.itemsToCheckout != null) {
+                  CartService.clearCart();
+                }
+
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => OrderSuccessPage(
+                      orderedItems: _items,
+                      totalAmount: total,
+                      orderId: orderId,
+                    ),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue[700],
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 14,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              child: const Text('Buat Pesanan'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildAddressCard() {
@@ -83,10 +198,7 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
             const SizedBox(height: 4),
             Text(
               'Jl. Pahlawan No. 123, Madiun, Jawa Timur, 63117',
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 14,
-              ),
+              style: TextStyle(color: Colors.grey[600], fontSize: 14),
             ),
           ],
         ),
@@ -115,10 +227,7 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 16.0,
-                vertical: 8.0,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Text(
                 'Rincian Produk',
                 style: TextStyle(
@@ -154,10 +263,7 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
                               width: 60,
                               height: 60,
                               color: Colors.grey[200],
-                              child: Icon(
-                                Icons.pets,
-                                color: Colors.grey[400],
-                              ),
+                              child: Icon(Icons.pets, color: Colors.grey[400]),
                             );
                           },
                         ),
@@ -230,7 +336,11 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: Icon(Icons.payment_outlined, color: Colors.blue[700], size: 24),
+        leading: Icon(
+          Icons.payment_outlined,
+          color: Colors.blue[700],
+          size: 24,
+        ),
         title: const Text(
           'Metode Pembayaran',
           style: TextStyle(
@@ -241,10 +351,7 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
         ),
         subtitle: Text(
           'Pilih Metode Pembayaran',
-          style: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 13,
-          ),
+          style: TextStyle(color: Colors.grey[600], fontSize: 13),
         ),
         trailing: Icon(Icons.chevron_right, color: Colors.grey[400]),
         onTap: () {},
@@ -289,17 +396,11 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
               children: [
                 Text(
                   'Subtotal Produk',
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: Colors.grey[700], fontSize: 14),
                 ),
                 Text(
                   formatCurrency.format(subtotal),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black87,
-                  ),
+                  style: const TextStyle(fontSize: 14, color: Colors.black87),
                 ),
               ],
             ),
@@ -309,17 +410,11 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
               children: [
                 Text(
                   'Biaya Pengiriman',
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: Colors.grey[700], fontSize: 14),
                 ),
                 Text(
                   formatCurrency.format(shippingCost),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black87,
-                  ),
+                  style: const TextStyle(fontSize: 14, color: Colors.black87),
                 ),
               ],
             ),
@@ -344,121 +439,6 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
                   ),
                 ),
               ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    double subtotal = _items.fold(
-      0,
-      (sum, item) => sum + (item.food.price * item.quantity),
-    );
-    const double shippingCost = 15000;
-    final double total = subtotal + shippingCost;
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        title: const Text(
-          'Checkout',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black87),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildAddressCard(),
-            _buildProductList(),
-            _buildPaymentMethod(),
-            _buildOrderSummary(subtotal),
-            const SizedBox(height: 80),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Total Pembayaran:',
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 13,
-                  ),
-                ),
-                Text(
-                  formatCurrency.format(total),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: Colors.blue[700],
-                  ),
-                ),
-              ],
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final String orderId =
-                    'INV-${DateFormat('ddMMyyyy-HHmm').format(DateTime.now())}';
-                if (widget.cartItems != null) {
-                  CartService.clearCart();
-                }
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => OrderSuccessPage(
-                      orderedItems: _items,
-                      totalAmount: total,
-                      orderId: orderId,
-                    ),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue[700],
-                foregroundColor: Colors.white,
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 14,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                textStyle: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              child: const Text('Buat Pesanan'),
             ),
           ],
         ),

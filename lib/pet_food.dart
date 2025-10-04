@@ -1,4 +1,6 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: use_key_in_widget_constructors, unused_import
+
+import 'package:flutter/material.dart'; // <-- INI YANG HILANG DAN PALING PENTING
 import 'models/pet_food_model.dart';
 import 'models/pet_food_service.dart';
 import 'models/cart_service.dart';
@@ -95,8 +97,8 @@ class _PetFoodListPageState extends State<PetFood> {
         filteredPetFoodItems = filteredPetFoodItems
             .where(
               (item) => item.name.toLowerCase().contains(
-                searchController.text.toLowerCase(),
-              ),
+                    searchController.text.toLowerCase(),
+                  ),
             )
             .toList();
       }
@@ -240,15 +242,14 @@ class _PetFoodListPageState extends State<PetFood> {
                     ),
                   )
                 : GridView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 5, // increased from 4 to 5
-                          childAspectRatio:
-                              0.85, // adjusted from 0.75 for better proportion
-                          crossAxisSpacing: 12, // reduced from 16
-                          mainAxisSpacing: 12, // reduced from 16
-                        ),
+                      crossAxisCount: 5,
+                      childAspectRatio: 0.75,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                    ),
                     itemCount: filteredPetFoodItems.length,
                     itemBuilder: (context, index) {
                       final petFood = filteredPetFoodItems[index];
@@ -288,242 +289,201 @@ class _PetFoodListPageState extends State<PetFood> {
   }
 
   Widget _buildPetFoodCard(PetFoodModel petFood, int index) {
-    // Determine if item should show badge
     bool isBestSeller = index % 5 == 0;
     bool isNew = index % 6 == 0 && !isBestSeller;
 
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PetFoodDetail(petFood: petFood),
-          ),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 2,
-              blurRadius: 6,
-              offset: const Offset(0, 3),
+    return Card(
+      elevation: 4,
+      shadowColor: Colors.grey.withOpacity(0.2),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PetFoodDetail(petFood: petFood),
             ),
-          ],
-        ),
+          );
+        },
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Stack(
-              children: [
-                Container(
-                  height: 140, // reduced from 180
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      topRight: Radius.circular(12),
-                    ),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      topRight: Radius.circular(12),
-                    ),
-                    child: Image.network(
-                      petFood.imageUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey[200],
-                          child: Icon(
-                            Icons.pets,
-                            size: 60,
-                            color: Colors.grey[400],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                if (isBestSeller)
-                  Positioned(
-                    top: 8,
-                    left: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: const Text(
-                        'Best Seller',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                if (isNew)
-                  Positioned(
-                    top: 8,
-                    left: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: const Text(
-                        'New',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+            // Area Gambar dan Nama Produk (digabung)
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Gambar Produk
+                  Image.network(
+                    petFood.imageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey.shade200,
+                        child: Icon(Icons.pets,
+                            size: 50, color: Colors.grey.shade400),
+                      );
+                    },
+                  ),
+
+                  // Latar Belakang Gradien untuk Teks
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      height: 60,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            Colors.black.withOpacity(0.7),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Nama Produk
+                  Positioned(
+                    bottom: 8,
+                    left: 12,
+                    right: 12,
+                    child: Text(
                       petFood.name,
                       style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      petFood.brand,
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+
+                  // Badge
+                  if (isBestSeller || isNew)
+                    Positioned(
+                      top: 8,
+                      left: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: isBestSeller
+                              ? Colors.orangeAccent
+                              : Colors.redAccent,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          isBestSeller ? 'Best Seller' : 'New',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+
+            // Area Harga dan Tombol
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Harga
+                  Flexible(
+                    child: Text(
+                      petFood.formattedPrice,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue.shade700,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const Spacer(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          petFood.formattedPrice,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue[700],
+                  ),
+
+                  // Tombol-tombol
+                  Row(
+                    children: [
+                      SizedBox(
+                        height: 32,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => OrderConfirmationPage(
+                                  singleItem: petFood,
+                                ),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green.shade600,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 14),
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          child: const Text('Beli',
+                              style: TextStyle(
+                                  fontSize: 13, fontWeight: FontWeight.w600)),
                         ),
-                        Row(
-                          children: [
-                            SizedBox(
-                              height: 32,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          OrderConfirmationPage(
-                                            singleItem: petFood,
-                                          ),
-                                    ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green[600],
-                                  foregroundColor: Colors.white,
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Beli',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                      ),
+                      const SizedBox(width: 6),
+                      SizedBox(
+                        height: 32,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            CartService.addItemFromPetFood(petFood);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    '${petFood.name} ditambahkan ke keranjang'),
+                                duration: const Duration(seconds: 2),
+                                action: SnackBarAction(
+                                  label: 'LIHAT',
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const CartPage()));
+                                  },
                                 ),
                               ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue.shade600,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                            const SizedBox(width: 8),
-                            SizedBox(
-                              height: 32,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  CartService.addItemFromPetFood(petFood);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        '${petFood.name} added to cart',
-                                      ),
-                                      duration: const Duration(seconds: 2),
-                                      action: SnackBarAction(
-                                        label: 'VIEW',
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const CartPage(),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue[600],
-                                  foregroundColor: Colors.white,
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                  ),
-                                ),
-                                child: const Text(
-                                  '+ Add',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 14),
+                          ),
+                          child: const Text('+ Add',
+                              style: TextStyle(
+                                  fontSize: 13, fontWeight: FontWeight.w600)),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  )
+                ],
               ),
             ),
           ],
