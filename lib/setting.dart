@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'theme_provider.dart'; // Pastikan path file ini benar
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -10,23 +12,35 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   bool _notificationsEnabled = true;
 
+  String _getCurrentThemeName(ThemeMode themeMode) {
+    switch (themeMode) {
+      case ThemeMode.light:
+        return 'Mode Terang';
+      case ThemeMode.dark:
+        return 'Mode Gelap';
+      case ThemeMode.system:
+      default:
+        return 'Sesuai Sistem';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
         title: const Text('Pengaturan'),
-        backgroundColor: const Color(0xFF6A55DF),
-        foregroundColor: Colors.white,
-        elevation: 0,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
+        elevation: 2,
       ),
       body: ListView(
         children: [
           _buildUserProfileSection(),
-
-          const SizedBox(height: 10),
-          const Divider(),
-
-          // Grup Pengaturan Akun
+          const SizedBox(height: 8),
+          Divider(color: Theme.of(context).dividerColor, thickness: 1),
           _buildSettingsGroupTitle('Akun'),
           _buildSettingsListTile(
             icon: Icons.person_outline,
@@ -42,14 +56,12 @@ class _SettingsPageState extends State<SettingsPage> {
               print('Navigasi ke halaman Ubah Password');
             },
           ),
-
           const Divider(),
-
           _buildSettingsGroupTitle('Preferensi'),
           SwitchListTile(
-            secondary: const Icon(
+            secondary: Icon(
               Icons.notifications_outlined,
-              color: Colors.grey,
+              color: Theme.of(context).colorScheme.secondary,
             ),
             title: const Text('Notifikasi Push'),
             value: _notificationsEnabled,
@@ -58,14 +70,14 @@ class _SettingsPageState extends State<SettingsPage> {
                 _notificationsEnabled = value;
               });
             },
-            activeThumbColor: const Color(0xFF6A55DF),
+            activeColor: Theme.of(context).primaryColor,
           ),
           _buildSettingsListTile(
             icon: Icons.palette_outlined,
             title: 'Tema',
-            subtitle: 'Mode Terang',
+            subtitle: _getCurrentThemeName(themeProvider.themeMode),
             onTap: () {
-              print('Buka pilihan tema');
+              _showThemeDialog(context, themeProvider);
             },
           ),
           _buildSettingsListTile(
@@ -76,9 +88,7 @@ class _SettingsPageState extends State<SettingsPage> {
               print('Buka pilihan bahasa');
             },
           ),
-
           const Divider(),
-
           _buildSettingsGroupTitle('Lainnya'),
           _buildSettingsListTile(
             icon: Icons.info_outline,
@@ -94,26 +104,68 @@ class _SettingsPageState extends State<SettingsPage> {
               print('Navigasi ke halaman bantuan');
             },
           ),
-
           const Divider(),
-
           _buildLogoutTile(),
         ],
       ),
     );
   }
 
+  void _showThemeDialog(BuildContext context, ThemeProvider themeProvider) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: const Text('Pilih Tema'),
+          children: <Widget>[
+            RadioListTile<ThemeMode>(
+              title: const Text('Mode Terang'),
+              value: ThemeMode.light,
+              groupValue: themeProvider.themeMode,
+              onChanged: (ThemeMode? value) {
+                if (value != null) {
+                  themeProvider.setThemeMode(value);
+                }
+                Navigator.pop(context);
+              },
+            ),
+            RadioListTile<ThemeMode>(
+              title: const Text('Mode Gelap'),
+              value: ThemeMode.dark,
+              groupValue: themeProvider.themeMode,
+              onChanged: (ThemeMode? value) {
+                if (value != null) {
+                  themeProvider.setThemeMode(value);
+                }
+                Navigator.pop(context);
+              },
+            ),
+            RadioListTile<ThemeMode>(
+              title: const Text('Sesuai Sistem'),
+              value: ThemeMode.system,
+              groupValue: themeProvider.themeMode,
+              onChanged: (ThemeMode? value) {
+                if (value != null) {
+                  themeProvider.setThemeMode(value);
+                }
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildUserProfileSection() {
     return Container(
       padding: const EdgeInsets.all(16.0),
-      color: const Color(0xFF6A55DF).withOpacity(0.05),
+      color: Theme.of(context).colorScheme.surface,
       child: const Row(
         children: [
           CircleAvatar(
             radius: 35,
-            backgroundImage: NetworkImage(
-              'https://i.pravatar.cc/150?img=32',
-            ), 
+            backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=32'),
           ),
           SizedBox(width: 20),
           Column(
@@ -125,7 +177,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               SizedBox(height: 4),
               Text(
-                'riski@gmail.com', 
+                'riski@gmail.com',
                 style: TextStyle(fontSize: 14, color: Colors.grey),
               ),
             ],
@@ -140,10 +192,10 @@ class _SettingsPageState extends State<SettingsPage> {
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Text(
         title.toUpperCase(),
-        style: const TextStyle(
-          color: Color(0xFF6A55DF),
+        style: TextStyle(
+          color: Theme.of(context).primaryColor,
           fontWeight: FontWeight.bold,
-          fontSize: 12,
+          fontSize: 13,
         ),
       ),
     );
@@ -156,18 +208,24 @@ class _SettingsPageState extends State<SettingsPage> {
     required VoidCallback onTap,
   }) {
     return ListTile(
-      leading: Icon(icon, color: Colors.grey),
+      leading: Icon(icon, color: Theme.of(context).primaryColor),
       title: Text(title),
       subtitle: subtitle != null ? Text(subtitle) : null,
-      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+      trailing:
+          Icon(Icons.chevron_right, color: Theme.of(context).primaryColor),
       onTap: onTap,
     );
   }
 
   Widget _buildLogoutTile() {
     return ListTile(
-      leading: const Icon(Icons.logout, color: Colors.red),
-      title: const Text('Keluar', style: TextStyle(color: Colors.red)),
+      leading: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
+      title: Text(
+        'Keluar',
+        style: TextStyle(
+            color: Theme.of(context).colorScheme.error,
+            fontWeight: FontWeight.w500),
+      ),
       onTap: () {
         showDialog(
           context: context,
@@ -177,15 +235,19 @@ class _SettingsPageState extends State<SettingsPage> {
               content: const Text('Apakah Anda yakin ingin keluar?'),
               actions: <Widget>[
                 TextButton(
-                  child: const Text('Batal'),
+                  child: Text(
+                    'Batal',
+                    style: TextStyle(color: Theme.of(context).primaryColor),
+                  ),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
                 ),
                 TextButton(
-                  child: const Text(
+                  child: Text(
                     'Keluar',
-                    style: TextStyle(color: Colors.red),
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.error),
                   ),
                   onPressed: () {
                     Navigator.of(context).pop();

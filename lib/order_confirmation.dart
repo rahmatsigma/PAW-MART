@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'models/cart_item_model.dart';
 import 'models/pet_food_model.dart';
-import 'models/cart_service.dart'; // Add this import
+import 'models/cart_service.dart'; 
 import 'order_succes.dart';
 
 class OrderConfirmationPage extends StatefulWidget {

@@ -1,6 +1,4 @@
-// ignore_for_file: use_key_in_widget_constructors, unused_import
-
-import 'package:flutter/material.dart'; // <-- INI YANG HILANG DAN PALING PENTING
+import 'package:flutter/material.dart'; 
 import 'models/pet_food_model.dart';
 import 'models/pet_food_service.dart';
 import 'models/cart_service.dart';
@@ -309,12 +307,10 @@ class _PetFoodListPageState extends State<PetFood> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Area Gambar dan Nama Produk (digabung)
             Expanded(
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  // Gambar Produk
                   Image.network(
                     petFood.imageUrl,
                     fit: BoxFit.cover,
@@ -327,7 +323,6 @@ class _PetFoodListPageState extends State<PetFood> {
                     },
                   ),
 
-                  // Latar Belakang Gradien untuk Teks
                   Positioned(
                     bottom: 0,
                     left: 0,
@@ -347,7 +342,6 @@ class _PetFoodListPageState extends State<PetFood> {
                     ),
                   ),
 
-                  // Nama Produk
                   Positioned(
                     bottom: 8,
                     left: 12,
@@ -364,7 +358,6 @@ class _PetFoodListPageState extends State<PetFood> {
                     ),
                   ),
 
-                  // Badge
                   if (isBestSeller || isNew)
                     Positioned(
                       top: 8,
@@ -392,14 +385,12 @@ class _PetFoodListPageState extends State<PetFood> {
               ),
             ),
 
-            // Area Harga dan Tombol
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Harga
                   Flexible(
                     child: Text(
                       petFood.formattedPrice,
@@ -413,7 +404,6 @@ class _PetFoodListPageState extends State<PetFood> {
                     ),
                   ),
 
-                  // Tombol-tombol
                   Row(
                     children: [
                       SizedBox(
@@ -476,7 +466,7 @@ class _PetFoodListPageState extends State<PetFood> {
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 14),
                           ),
-                          child: const Text('+ Add',
+                          child: const Text('+Cart',
                               style: TextStyle(
                                   fontSize: 13, fontWeight: FontWeight.w600)),
                         ),
