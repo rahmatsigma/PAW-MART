@@ -89,6 +89,7 @@ flutter:
     - assets/images/kaytee_nectar.png
     - assets/images/rc_sensitive.png
     - assets/images/tops_pellets.png
+    - assets/images/qris.png
 
 
   # The following line ensures that the Material Icons font is

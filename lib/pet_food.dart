@@ -110,6 +110,12 @@ class _PetFoodListPageState extends State<PetFood> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: Icon(Icons.arrow_back, color: Colors.blue[700]),
+                onPressed: () => Navigator.of(context).pop(),
+              )
+            : null,
         title: Row(
           children: [
             Icon(
@@ -118,21 +124,16 @@ class _PetFoodListPageState extends State<PetFood> {
               size: 28,
             ),
             const SizedBox(width: 8),
-            Text(
+            const Text(
               'Shop',
               style: TextStyle(
-                color: Colors.blue[700],
+                color: Color(0xFF1A237E),
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
               ),
             ),
-          ],
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: SizedBox(
-              width: 200,
+            const SizedBox(width: 16),
+            Expanded(
               child: TextField(
                 controller: searchController,
                 decoration: InputDecoration(
@@ -154,11 +155,14 @@ class _PetFoodListPageState extends State<PetFood> {
                 ),
               ),
             ),
-          ),
+          ],
+        ),
+        actions: [
           ValueListenableBuilder<int>(
             valueListenable: CartService.cartItemCountNotifier,
             builder: (context, cartItemCount, child) {
               return Stack(
+                alignment: Alignment.center,
                 children: [
                   IconButton(
                     icon: Icon(
@@ -249,9 +253,10 @@ class _PetFoodListPageState extends State<PetFood> {
                 : GridView.builder(
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                     gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 5,
-                      childAspectRatio: 0.75,
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 200,
+                      
+                      childAspectRatio: 0.7,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
                     ),
@@ -390,11 +395,12 @@ class _PetFoodListPageState extends State<PetFood> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end, 
                 children: [
+                  
                   Flexible(
                     child: Text(
                       petFood.formattedPrice,
@@ -407,10 +413,12 @@ class _PetFoodListPageState extends State<PetFood> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  Row(
+                  
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       SizedBox(
-                        height: 32,
+                        height: 28, 
                         child: ElevatedButton(
                           onPressed: () {
                             Navigator.push(
@@ -426,19 +434,19 @@ class _PetFoodListPageState extends State<PetFood> {
                             backgroundColor: Colors.green.shade600,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(6),
                             ),
                             padding:
-                                const EdgeInsets.symmetric(horizontal: 14),
+                                const EdgeInsets.symmetric(horizontal: 16),
                           ),
                           child: const Text('Beli',
                               style: TextStyle(
-                                  fontSize: 13, fontWeight: FontWeight.w600)),
+                                  fontSize: 12, fontWeight: FontWeight.w600)),
                         ),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(height: 4), 
                       SizedBox(
-                        height: 32,
+                        height: 28, 
                         child: ElevatedButton(
                           onPressed: () {
                             CartService.addItemFromPetFood(petFood);
@@ -465,14 +473,14 @@ class _PetFoodListPageState extends State<PetFood> {
                             backgroundColor: Colors.blue.shade600,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(6),
                             ),
                             padding:
-                                const EdgeInsets.symmetric(horizontal: 14),
+                                const EdgeInsets.symmetric(horizontal: 10),
                           ),
                           child: const Text('+Cart',
                               style: TextStyle(
-                                  fontSize: 13, fontWeight: FontWeight.w600)),
+                                  fontSize: 12, fontWeight: FontWeight.w600)),
                         ),
                       ),
                     ],

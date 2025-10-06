@@ -1,9 +1,14 @@
+// lib/order_confirmation.dart
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'models/cart_item_model.dart';
 import 'models/pet_food_model.dart';
-import 'models/cart_service.dart'; 
+import 'models/cart_service.dart';
+import 'models/payment_method_model.dart';
 import 'order_succes.dart';
+import 'payment_method.dart';
+import 'qr_payment.dart';
 
 class OrderConfirmationPage extends StatefulWidget {
   final List<CartItem>? itemsToCheckout;
@@ -21,6 +26,8 @@ class OrderConfirmationPage extends StatefulWidget {
 
 class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
   List<CartItem> _items = [];
+  PaymentMethod? _selectedPaymentMethod;
+
   final formatCurrency = NumberFormat.currency(
     locale: 'id_ID',
     symbol: 'Rp ',
@@ -34,6 +41,23 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
       _items = widget.itemsToCheckout!;
     } else if (widget.singleItem != null) {
       _items = [CartItem(food: widget.singleItem!, quantity: 1)];
+    }
+  }
+
+  void _selectPaymentMethod() async {
+    final result = await Navigator.push<PaymentMethod>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PaymentMethodPage(
+          currentMethod: _selectedPaymentMethod,
+        ),
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        _selectedPaymentMethod = result;
+      });
     }
   }
 
@@ -106,6 +130,16 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
             ),
             ElevatedButton(
               onPressed: () {
+                if (_selectedPaymentMethod == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Silakan pilih metode pembayaran terlebih dahulu.'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+
                 final String orderId =
                     'INV-${DateFormat('ddMMyyyy-HHmm').format(DateTime.now())}';
 
@@ -113,16 +147,29 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
                   CartService.clearCart();
                 }
 
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => OrderSuccessPage(
-                      orderedItems: _items,
-                      totalAmount: total,
-                      orderId: orderId,
+                if (_selectedPaymentMethod!.type == PaymentType.qris) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QrPaymentPage(
+                        totalAmount: total,
+                        orderId: orderId,
+                        orderedItems: _items, // <-- Mengirim data item
+                      ),
                     ),
-                  ),
-                );
+                  );
+                } else {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => OrderSuccessPage(
+                        orderedItems: _items,
+                        totalAmount: total,
+                        orderId: orderId,
+                      ),
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue[700],
@@ -144,6 +191,50 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildPaymentMethod() {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        leading: Icon(
+          Icons.payment_outlined,
+          color: Colors.blue[700],
+          size: 24,
+        ),
+        title: const Text(
+          'Metode Pembayaran',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+            color: Colors.black87,
+          ),
+        ),
+        subtitle: Text(
+          _selectedPaymentMethod?.name ?? 'Pilih Metode Pembayaran',
+          style: TextStyle(
+              color: _selectedPaymentMethod == null
+                  ? Colors.red[400]
+                  : Colors.grey[600],
+              fontSize: 13),
+        ),
+        trailing: Icon(Icons.chevron_right, color: Colors.grey[400]),
+        onTap: _selectPaymentMethod,
       ),
     );
   }
@@ -315,46 +406,6 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildPaymentMethod() {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: Icon(
-          Icons.payment_outlined,
-          color: Colors.blue[700],
-          size: 24,
-        ),
-        title: const Text(
-          'Metode Pembayaran',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-            color: Colors.black87,
-          ),
-        ),
-        subtitle: Text(
-          'Pilih Metode Pembayaran',
-          style: TextStyle(color: Colors.grey[600], fontSize: 13),
-        ),
-        trailing: Icon(Icons.chevron_right, color: Colors.grey[400]),
-        onTap: () {},
       ),
     );
   }

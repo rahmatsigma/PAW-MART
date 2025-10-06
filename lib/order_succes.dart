@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'models/cart_item_model.dart'; 
+import 'models/cart_item_model.dart';
+import 'beranda_page.dart'; 
 
 class OrderSuccessPage extends StatelessWidget {
   final List<CartItem> orderedItems;
@@ -301,7 +302,11 @@ class OrderSuccessPage extends StatelessWidget {
         width: double.infinity,
         child: ElevatedButton(
           onPressed: () {
-            Navigator.of(context).popUntil((route) => route.isFirst);
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => BerandaPage(email: '',)), 
+              (Route<dynamic> route) => false,
+            );
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blue[700],
