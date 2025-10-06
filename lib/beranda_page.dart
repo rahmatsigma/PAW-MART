@@ -154,7 +154,7 @@ class BerandaPage extends StatelessWidget {
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22),
         ),
         actions: !isMobile
-            ? [ 
+            ? [
                 NavTextButton(text: "Home", onPressed: () {}),
                 const SizedBox(width: 15),
                 NavTextButton(
@@ -190,7 +190,7 @@ class BerandaPage extends StatelessWidget {
                 _buildProfileMenu(context),
                 const SizedBox(width: 20),
               ]
-            : [ 
+            : [
                 IconButton(
                   icon: Icon(Icons.shopping_cart_outlined, color: Colors.grey[800]),
                   onPressed: () {
@@ -264,7 +264,13 @@ class BerandaPage extends StatelessWidget {
               child: const Text('Shop Now', style: TextStyle(fontSize: 16, color: Colors.white)),
             ),
             OutlinedButton(
-              onPressed: () {},
+              onPressed: () {
+                // PERUBAHAN DI SINI
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AboutPage()),
+                );
+              },
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),

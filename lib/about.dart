@@ -76,8 +76,7 @@ class AboutPage extends StatelessWidget {
           children: [
             const CircleAvatar(
               radius: 60,
-              backgroundColor: Color(0xFFE0E0E0),
-              child: Icon(Icons.person, size: 60, color: Colors.white),
+              backgroundImage: AssetImage('assets/images/riski.png'),
             ),
             const SizedBox(height: 16),
             Text(
@@ -149,3 +148,4 @@ class AboutPage extends StatelessWidget {
     );
   }
 }
+
