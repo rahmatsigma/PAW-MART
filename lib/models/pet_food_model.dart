@@ -183,3 +183,71 @@
     String get indoorStatus => isIndoor ? 'Indoor Cat' : 'Outdoor Cat';
     bool get isForKitten => lifestage.toLowerCase() == 'kitten';
   }
+
+  class BirdFood extends PetFoodModel {
+  final List<String> birdTypes; 
+  final String mixType; 
+  final List<String> benefits; 
+
+  BirdFood({
+    required super.id,
+    required super.name,
+    required super.brand,
+    required super.category,
+    required super.price,
+    required super.imageUrl,
+    required super.description,
+    required super.weight,
+    required super.stock,
+    required this.birdTypes,
+    required this.mixType,
+    required this.benefits,
+  }) : super(
+          animalType: 'bird',
+        );
+
+  List<String> get getBirdTypes => birdTypes;
+  String get getMixType => mixType;
+  List<String> get getBenefits => benefits;
+
+  @override
+  String toString() {
+    return 'BirdFood{${super.toString()}, birdTypes: $birdTypes, mixType: $mixType, benefits: $benefits}';
+  }
+
+  bool get isSeedMix => mixType.toLowerCase().contains('seed');
+}
+
+class FishFood extends PetFoodModel {
+  final String foodForm; 
+  final String waterType; 
+  final bool isColorEnhancing;
+
+  FishFood({
+    required super.id,
+    required super.name,
+    required super.brand,
+    required super.category,
+    required super.price,
+    required super.imageUrl,
+    required super.description,
+    required super.weight,
+    required super.stock,
+    required this.foodForm,
+    required this.waterType,
+    required this.isColorEnhancing,
+  }) : super(
+          animalType: 'fish',
+        );
+
+  String get getFoodForm => foodForm;
+  String get getWaterType => waterType;
+  bool get getIsColorEnhancing => isColorEnhancing;
+
+  @override
+  String toString() {
+    return 'FishFood{${super.toString()}, foodForm: $foodForm, waterType: $waterType, isColorEnhancing: $isColorEnhancing}';
+  }
+  
+  bool get isForSaltwater => waterType.toLowerCase() == 'saltwater';
+}

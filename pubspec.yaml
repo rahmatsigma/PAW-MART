@@ -78,7 +78,17 @@ flutter:
     - assets/images/tetramin.jpg
     - assets/images/riski.png
     - assets/images/royalcaninmedium.png
-
+    - assets/images/eukanuba.png
+    - assets/images/meo_senior.png
+    - assets/images/acana.png
+    - assets/images/prestige_lovebird.png
+    - assets/images/atison.png
+    - assets/images/spectrum.png
+    - assets/images/cesar.png
+    - assets/images/hikari_wafers.png
+    - assets/images/kaytee_nectar.png
+    - assets/images/rc_sensitive.png
+    - assets/images/tops_pellets.png
 
 
   # The following line ensures that the Material Icons font is

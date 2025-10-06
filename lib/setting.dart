@@ -29,7 +29,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         title: const Text('Pengaturan'),
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
@@ -70,7 +70,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 _notificationsEnabled = value;
               });
             },
-            activeColor: Theme.of(context).primaryColor,
+            activeThumbColor: Theme.of(context).primaryColor,
           ),
           _buildSettingsListTile(
             icon: Icons.palette_outlined,
