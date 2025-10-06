@@ -3,7 +3,6 @@ import 'pet_food_model.dart';
 class PetFoodService {
   static List<PetFoodModel> getAllPetFoods() {
     return [
-      // Produk yang sudah ada (9 item)
       DogFood(
         id: 1,
         name: 'Royal Canin Adult Medium',
@@ -58,7 +57,6 @@ class PetFoodService {
         lifestage: 'kitten',
         healthBenefits: ['OptiStart', 'Immune Support'],
       ),
-      // Diubah menggunakan class BirdFood
       BirdFood(
         id: 5,
         name: 'Versele Premium Bird Food',
@@ -86,7 +84,6 @@ class PetFoodService {
         ageGroup: 'senior',
         specialFeatures: ['Antioxidants', 'Joint Support'],
       ),
-      // Diubah menggunakan class FishFood
       FishFood(
         id: 7,
         name: 'TetraMin Tropical Flakes',
@@ -102,7 +99,6 @@ class PetFoodService {
         waterType: 'Freshwater',
         isColorEnhancing: true,
       ),
-      // Diubah menggunakan class FishFood
       FishFood(
         id: 8,
         name: 'Hikari Goldfish Gold',

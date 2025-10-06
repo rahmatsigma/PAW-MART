@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
 import 'models/pet_food_model.dart';
 import 'models/pet_food_service.dart';
 import 'models/cart_service.dart';
@@ -155,45 +155,52 @@ class _PetFoodListPageState extends State<PetFood> {
               ),
             ),
           ),
-          Stack(
-            children: [
-              IconButton(
-                icon: Icon(
-                  Icons.shopping_cart_outlined,
-                  color: Colors.grey[700],
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const CartPage()),
-                  );
-                },
-              ),
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.blue,
-                    shape: BoxShape.circle,
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 16,
-                    minHeight: 16,
-                  ),
-                  child: const Text(
-                    '0',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
+          ValueListenableBuilder<int>(
+            valueListenable: CartService.cartItemCountNotifier,
+            builder: (context, cartItemCount, child) {
+              return Stack(
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.shopping_cart_outlined,
+                      color: Colors.grey[700],
                     ),
-                    textAlign: TextAlign.center,
+                    onPressed: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const CartPage()),
+                      );
+                      setState(() {});
+                    },
                   ),
-                ),
-              ),
-            ],
+                  if (cartItemCount > 0)
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: const BoxDecoration(
+                          color: Colors.blue,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 18,
+                          minHeight: 18,
+                        ),
+                        child: Text(
+                          cartItemCount.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
           ),
           const SizedBox(width: 8),
         ],
@@ -296,13 +303,14 @@ class _PetFoodListPageState extends State<PetFood> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () {
-          Navigator.push(
+        onTap: () async {
+          await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => PetFoodDetail(petFood: petFood),
             ),
           );
+          setState(() {});
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -322,7 +330,6 @@ class _PetFoodListPageState extends State<PetFood> {
                       );
                     },
                   ),
-
                   Positioned(
                     bottom: 0,
                     left: 0,
@@ -341,7 +348,6 @@ class _PetFoodListPageState extends State<PetFood> {
                       ),
                     ),
                   ),
-
                   Positioned(
                     bottom: 8,
                     left: 12,
@@ -357,7 +363,6 @@ class _PetFoodListPageState extends State<PetFood> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-
                   if (isBestSeller || isNew)
                     Positioned(
                       top: 8,
@@ -384,7 +389,6 @@ class _PetFoodListPageState extends State<PetFood> {
                 ],
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: Row(
@@ -403,7 +407,6 @@ class _PetFoodListPageState extends State<PetFood> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-
                   Row(
                     children: [
                       SizedBox(
@@ -446,12 +449,13 @@ class _PetFoodListPageState extends State<PetFood> {
                                 duration: const Duration(seconds: 2),
                                 action: SnackBarAction(
                                   label: 'LIHAT',
-                                  onPressed: () {
-                                    Navigator.push(
+                                  onPressed: () async {
+                                    await Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
                                                 const CartPage()));
+                                    setState(() {});
                                   },
                                 ),
                               ),

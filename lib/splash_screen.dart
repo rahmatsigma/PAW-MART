@@ -99,7 +99,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
               ),
-              const SizedBox(height: 16), // Kurangi jarak dari 32 menjadi 16
+              const SizedBox(height: 16), 
             ],
           ),
         ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'theme_provider.dart'; // Pastikan path file ini benar
+import 'theme_provider.dart'; 
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
