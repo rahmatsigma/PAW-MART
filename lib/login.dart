@@ -72,7 +72,7 @@ class _LoginPageState extends State<LoginPage> {
                     Text(
                       'DI PAW MART',
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: 16, color: const Color.fromARGB(255, 0, 0, 0)),
                     ),
                     const SizedBox(height: 32),
                     _buildTextField(
