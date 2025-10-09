@@ -1,9 +1,18 @@
+import 'package:firebase_auth/firebase_auth.dart'; 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:myapp/firebase_options.dart';
 import 'package:provider/provider.dart';
-import 'splash_screen.dart'; 
+import 'package:myapp/login.dart'; 
+import 'package:myapp/beranda_page.dart';   
 import 'theme_provider.dart'; 
 
-void main() {  
+void main() async {
+  
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(
     ChangeNotifierProvider(
       create: (context) => ThemeProvider(),
@@ -16,19 +25,18 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {    
+  Widget build(BuildContext context) {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
         return MaterialApp(
-          title: 'Login Page',
-          debugShowCheckedModeBanner: false,                    
+          title: 'My App', 
+          debugShowCheckedModeBanner: false,
           themeMode: themeProvider.themeMode,
-          
           theme: ThemeData(
             brightness: Brightness.light,
             useMaterial3: true,
             colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color(0xFF1BA0E2), 
+              seedColor: const Color(0xFF1BA0E2),
               brightness: Brightness.light,
             ),
             appBarTheme: const AppBarTheme(
@@ -36,18 +44,46 @@ class MyApp extends StatelessWidget {
               foregroundColor: Color.fromARGB(255, 0, 0, 0),
             ),
           ),
-          
           darkTheme: ThemeData(
             brightness: Brightness.dark,
             useMaterial3: true,
             colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color(0xFF1BA0E2), 
+              seedColor: const Color(0xFF1BA0E2),
               brightness: Brightness.dark,
             ),
-          ),          
-          home: const SplashScreen(), 
+          ),
+          
+          home: const AuthGate(), 
         );
-      },
+    },
+    );
+  }
+}
+
+
+class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasData) {
+            final user = snapshot.data!;
+            return BerandaPage(email: user.email ?? 'No Email');
+          } 
+          
+          else {
+            return const LoginPage();
+          }
+        },
+      ),
     );
   }
 }

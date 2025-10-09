@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/register_page.dart';
-import 'package:myapp/beranda_page.dart';
+// Hapus import BerandaPage karena navigasi ditangani AuthGate
+// import 'package:myapp/beranda_page.dart'; 
+import 'package:myapp/services/auth_service.dart'; // <-- IMPORT SERVICE
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,11 +15,16 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isLoading = false; // <-- State untuk loading indicator
+
+  // Instance dari AuthService
+  final AuthService _authService = AuthService();
 
   final Color primaryColor = const Color(0xFF4A90E2);
 
   @override
   Widget build(BuildContext context) {
+    // ... (UI Anda tidak berubah, jadi saya persingkat)
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -96,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _handleLogin,
+                        onPressed: _isLoading ? null : _handleLogin, // <-- Nonaktifkan saat loading
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryColor,
                           foregroundColor: Colors.white,
@@ -107,13 +114,15 @@ class _LoginPageState extends State<LoginPage> {
                           elevation: 5,
                           shadowColor: primaryColor.withOpacity(0.4),
                         ),
-                        child: const Text(
-                          'Login',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: _isLoading 
+                          ? const CircularProgressIndicator(color: Colors.white,) // <-- Tampilkan loading
+                          : const Text(
+                              'Login',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -154,6 +163,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  // ... (Widget _buildTextField dan _buildPasswordField tetap sama)
   Widget _buildTextField({
     required TextEditingController controller,
     required String labelText,
@@ -223,7 +233,8 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
   
-  void _handleLogin() {    
+  // LOGIKA LOGIN BARU
+  void _handleLogin() async {    
     final inputEmail = _emailController.text.trim();
     final inputPassword = _passwordController.text.trim();
     
@@ -231,25 +242,38 @@ class _LoginPageState extends State<LoginPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Email dan password tidak boleh kosong!'),
-          backgroundColor: Color.fromARGB(255, 255, 64, 67),
-        ),
-      );
-      return; 
-    }
-    
-    if (!inputEmail.toLowerCase().endsWith('@gmail.com')) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Format email harus menggunakan @gmail.com'),
           backgroundColor: Colors.redAccent,
         ),
       );
       return; 
     }
     
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => BerandaPage(email: inputEmail)),
-    );
+    // Tampilkan loading indicator
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final user = await _authService.signInWithEmailPassword(inputEmail, inputPassword);
+      
+      if (user == null && mounted) {
+        // Jika user null, berarti ada error (ditangani di service)
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Email atau password salah.'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+      // Jika berhasil, AuthGate akan otomatis mengarahkan ke HomePage.
+      // Tidak perlu navigasi manual di sini.
+    } finally {
+      // Sembunyikan loading indicator setelah selesai
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 }

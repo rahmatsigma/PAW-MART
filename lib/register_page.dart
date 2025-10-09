@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/services/auth_service.dart'; // <-- IMPORT SERVICE
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -14,15 +15,17 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _confirmController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
+  bool _isLoading = false; // <-- State untuk loading indicator
 
-  
+  // Instance dari AuthService
+  final AuthService _authService = AuthService();
+
   final Color primaryColor = const Color(0xFF4A90E2);
-  final Color backgroundColor = const Color(0xFFF0F4F8);
 
   @override
   Widget build(BuildContext context) {
+    // ... (UI Anda tidak berubah, jadi saya persingkat)
     return Scaffold(
-      
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -39,7 +42,6 @@ class _RegisterPageState extends State<RegisterPage> {
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 400),
-              
               child: Container(
                 padding: const EdgeInsets.all(24.0),
                 decoration: BoxDecoration(
@@ -56,7 +58,6 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    
                     Text(
                       'Buat Akun Baru',
                       style: TextStyle(
@@ -75,8 +76,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                     const SizedBox(height: 32),
-
-                    
                     _buildTextField(
                       controller: _nameController,
                       labelText: 'Nama Lengkap',
@@ -112,12 +111,10 @@ class _RegisterPageState extends State<RegisterPage> {
                       },
                     ),
                     const SizedBox(height: 32),
-
-                    
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _handleRegister,
+                        onPressed: _isLoading ? null : _handleRegister,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryColor,
                           foregroundColor: Colors.white,
@@ -128,15 +125,15 @@ class _RegisterPageState extends State<RegisterPage> {
                           elevation: 5,
                           shadowColor: primaryColor.withOpacity(0.4),
                         ),
-                        child: const Text(
-                          'Daftar',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
+                        child: _isLoading
+                          ? const CircularProgressIndicator(color: Colors.white,)
+                          : const Text(
+                              'Daftar',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
                       ),
                     ),
                     const SizedBox(height: 24),
-
-                    
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -146,7 +143,6 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            
                             Navigator.pop(context); 
                           },
                           child: Text(
@@ -170,7 +166,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  
+  // ... (Widget _buildTextField dan _buildPasswordField tetap sama)
   Widget _buildTextField({
     required TextEditingController controller,
     required String labelText,
@@ -200,7 +196,6 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
     );
   }
-  
   
   Widget _buildPasswordField({
     required TextEditingController controller,
@@ -238,9 +233,9 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
     );
   }
-  
-  
-  void _handleRegister() {
+
+  // LOGIKA REGISTER BARU
+  void _handleRegister() async {
     if (_nameController.text.isEmpty || _emailController.text.isEmpty || _passwordController.text.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Semua field harus diisi!')),
@@ -255,14 +250,38 @@ class _RegisterPageState extends State<RegisterPage> {
           backgroundColor: Colors.redAccent,
         ),
       );
-    } else {
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Registrasi berhasil!'),
-          backgroundColor: Colors.green,
-        ),
+      return;
+    } 
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final user = await _authService.signUpWithEmailPassword(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
       );
+
+      if (user != null && mounted) {
+        // Jika berhasil, AuthGate akan otomatis mengarahkan ke HomePage.
+        // Cukup kembali ke halaman sebelumnya (login)
+        Navigator.of(context).pop();
+      } else if (mounted) {
+        // Jika gagal
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Gagal membuat akun. Email mungkin sudah terdaftar.'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    } finally {
+      if(mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 }

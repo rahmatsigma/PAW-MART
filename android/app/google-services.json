@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "390486147963",
+    "project_id": "pawmartdb",
+    "storage_bucket": "pawmartdb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:390486147963:android:2031e21bdca34e582433de",
+        "android_client_info": {
+          "package_name": "com.example.myapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwAuCxbs-eBjwPrTDnGNzJj1BtPn2gBoQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
