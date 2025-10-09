@@ -1,23 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-
-class OrderHistory {
-  final String id;
-  final String date;
-  final String productName;
-  final String imageUrl;
-  final double total;
-  final String status;
-
-  OrderHistory({
-    required this.id,
-    required this.date,
-    required this.productName,
-    required this.imageUrl,
-    required this.total,
-    required this.status,
-  });
-}
+import 'package:myapp/models/order_model.dart';
+import 'package:myapp/services/firestore_service.dart';
+import 'package:intl/intl.dart';
 
 class OrderHistoryPage extends StatefulWidget {
   const OrderHistoryPage({super.key});
@@ -27,96 +11,13 @@ class OrderHistoryPage extends StatefulWidget {
 }
 
 class _OrderHistoryPageState extends State<OrderHistoryPage> {
-  final List<OrderHistory> _orders = [
-    OrderHistory(
-      id: 'INV-25092025-1959',
-      date: '25 Sep 2025',
-      productName: 'Royal Canin Adult',
-      imageUrl: 'assets/images/royalcanin.png', 
-      total: 165000,
-      status: 'Selesai',
-    ),
-    OrderHistory(
-      id: 'INV-24092025-1130',
-      date: '24 Sep 2025',
-      productName: 'Whiskas Adult Indoor',
-      imageUrl: 'assets/images/whiskas.png', 
-      total: 60000,
-      status: 'Selesai',
-    ),
-    OrderHistory(
-      id: 'INV-22092025-0815',
-      date: '22 Sep 2025',
-      productName: 'TetraMin Tropical Flakes',
-      imageUrl: 'assets/images/tetramin.jpg', 
-      total: 95000,
-      status: 'Dibatalkan',
-    ),
-  ];
+  final FirestoreService _firestoreService = FirestoreService();
+  late Future<List<OrderModel>> _ordersFuture;
 
-  void _showRatingDialog(OrderHistory order) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        double rating = 0;
-        final reviewController = TextEditingController();
-
-        return AlertDialog(
-          title: const Text('Beri Ulasan'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Image.network(order.imageUrl, height: 80),
-                const SizedBox(height: 8),
-                Text(order.productName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 16),
-                const Text('Seberapa puas kamu?'),
-                RatingBar.builder(
-                  initialRating: 0,
-                  minRating: 1,
-                  direction: Axis.horizontal,
-                  allowHalfRating: true,
-                  itemCount: 5,
-                  itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
-                  itemBuilder: (context, _) => const Icon(Icons.star, color: Colors.amber),
-                  onRatingUpdate: (rating) {
-                    rating = rating;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: reviewController,
-                  maxLines: 3,
-                  decoration: const InputDecoration(
-                    hintText: 'Tulis ulasanmu di sini...',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Batal'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                print('Rating: $rating');
-                print('Ulasan: ${reviewController.text}');
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Terima kasih atas ulasan Anda!')),
-                );
-              },
-              child: const Text('Kirim'),
-            ),
-          ],
-        );
-      },
-    );
+  @override
+  void initState() {
+    super.initState();
+    _ordersFuture = _firestoreService.getOrderHistory();
   }
 
   @override
@@ -125,62 +26,72 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
       appBar: AppBar(
         title: const Text('Riwayat Pesanan'),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(8),
-        itemCount: _orders.length,
-        itemBuilder: (context, index) {
-          final order = _orders[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(vertical: 8),
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(order.id, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      Text(order.status, style: TextStyle(
-                        color: order.status == 'Selesai' ? Colors.green : Colors.red,
-                        fontWeight: FontWeight.bold,
-                      )),
-                    ],
-                  ),
-                  const Divider(),
-                  Row(
-                    children: [
-                      Image.network(order.imageUrl, width: 60, height: 60, fit: BoxFit.cover),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(order.productName, style: const TextStyle(fontSize: 16)),
-                            Text('Tanggal: ${order.date}'),
-                            Text('Total: Rp ${order.total.toStringAsFixed(0)}'),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (order.status == 'Selesai')
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () => _showRatingDialog(order),
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: Colors.deepPurple,
-                        ),
-                        child: const Text('Beri Ulasan'),
-                      ),
-                    ),
-                ],
-              ),
-            ),
+      body: FutureBuilder<List<OrderModel>>(
+        future: _ordersFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('Anda belum memiliki riwayat pesanan.'));
+          }
+
+          final orders = snapshot.data!;
+          return ListView.builder(
+            itemCount: orders.length,
+            itemBuilder: (context, index) {
+              final order = orders[index];
+              return _buildOrderCard(order);
+            },
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildOrderCard(OrderModel order) {
+    final formatCurrency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+    final formatDate = DateFormat('dd MMMM yyyy, HH:mm');
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ExpansionTile(
+        title: Text(
+          'Pesanan #${order.id.substring(0, 8)}', // Tampilkan 8 karakter pertama ID
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(formatDate.format(order.orderDate)),
+        trailing: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              formatCurrency.format(order.totalPrice),
+              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
+            ),
+            Text(order.status),
+          ],
+        ),
+        children: order.items.map((item) {
+          return ListTile(
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: Image.network(
+                item.imageUrl,
+                width: 50,
+                height: 50,
+                fit: BoxFit.cover,
+              ),
+            ),
+            title: Text(item.name),
+            subtitle: Text('${item.quantity} x ${formatCurrency.format(item.price)}'),
+          );
+        }).toList(),
       ),
     );
   }
