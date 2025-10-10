@@ -1,14 +1,16 @@
-import 'package:firebase_auth/firebase_auth.dart'; 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:myapp/firebase_options.dart';
 import 'package:provider/provider.dart';
-import 'package:myapp/login.dart'; 
-import 'package:myapp/beranda_page.dart';   
-import 'theme_provider.dart'; 
+
+// Menggunakan import relatif yang lebih aman
+import 'firebase_options.dart';
+import 'login.dart';
+import 'beranda_page.dart';
+import 'theme_provider.dart';
+import 'splash_screen.dart'; // <-- 1. IMPORT SPLASH SCREEN ANDA
 
 void main() async {
-  
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -29,7 +31,7 @@ class MyApp extends StatelessWidget {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
         return MaterialApp(
-          title: 'My App', 
+          title: 'My App',
           debugShowCheckedModeBanner: false,
           themeMode: themeProvider.themeMode,
           theme: ThemeData(
@@ -52,14 +54,15 @@ class MyApp extends StatelessWidget {
               brightness: Brightness.dark,
             ),
           ),
-          
-          home: const AuthGate(), 
+          // 2. JADIKAN SPLASH SCREEN SEBAGAI HALAMAN UTAMA
+          home: const SplashScreen(),
         );
-    },
+      },
     );
   }
 }
 
+// 3. WIDGET SPLASH SCREEN INTERNAL DIHAPUS KARENA ANDA SUDAH PUNYA FILE SENDIRI
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
@@ -70,16 +73,20 @@ class AuthGate extends StatelessWidget {
       body: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
+          // Saat menunggu, cukup tampilkan loading indicator sederhana
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
+          if (snapshot.hasError) {
+            return const Center(child: Text("Terjadi kesalahan koneksi."));
+          }
+
           if (snapshot.hasData) {
             final user = snapshot.data!;
+            // Ini akan memanggil WIDGET BerandaPage yang sebenarnya
             return BerandaPage(email: user.email ?? 'No Email');
-          } 
-          
-          else {
+          } else {
             return const LoginPage();
           }
         },
@@ -87,3 +94,4 @@ class AuthGate extends StatelessWidget {
     );
   }
 }
+

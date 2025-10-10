@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:myapp/login.dart';
+// PERUBAHAN 1: Ganti tujuan import dari login.dart ke main.dart
+import 'package:myapp/main.dart'; 
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -49,10 +50,10 @@ class _SplashScreenState extends State<SplashScreen>
     Timer(const Duration(seconds: 4), () {
       Navigator.pushReplacement(
         context,
-
         PageRouteBuilder(
+          // PERUBAHAN 2: Arahkan ke AuthGate, bukan LoginPage
           pageBuilder: (context, animation, secondaryAnimation) =>
-              const LoginPage(),
+              const AuthGate(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },
@@ -93,13 +94,13 @@ class _SplashScreenState extends State<SplashScreen>
                 child: ScaleTransition(
                   scale: _scaleAnimation,
                   child: Image.asset(
-                    'assets/images/logo2.png',
+                    'assets/images/logo2.png', // Saya pertahankan logo2.png Anda
                     width: 500,
                     height: 500,
                   ),
                 ),
               ),
-              const SizedBox(height: 16), 
+              const SizedBox(height: 16),
             ],
           ),
         ),
@@ -107,4 +108,4 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 }
-  
+

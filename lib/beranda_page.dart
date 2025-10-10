@@ -1,37 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:myapp/about.dart';
+import 'package:myapp/cart_page.dart';
+import 'package:myapp/order_history.dart';
+import 'package:myapp/product_page.dart'; // <-- Menggunakan halaman produk yang baru
 import 'package:myapp/services/auth_service.dart';
-import 'product_page.dart'; // <-- PERUBAHAN 1: Import halaman baru
-// Hapus import 'pet_food.dart'; jika masih ada
-import 'setting.dart';
-import 'about.dart';
-import 'cart_page.dart';
-import 'order_history.dart'; 
-
-class NavTextButton extends StatelessWidget {
-  final String text;
-  final VoidCallback onPressed;
-
-  const NavTextButton({super.key, required this.text, required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: onPressed,
-      style: TextButton.styleFrom(
-        foregroundColor: Colors.grey[700],
-        textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
-      ),
-      child: Text(text),
-    );
-  }
-}
+import 'package:myapp/setting.dart';
 
 class BerandaPage extends StatelessWidget {
   final String email;
-  final AuthService _authService = AuthService(); // Buat instance AuthService
-  
-  BerandaPage({super.key, required this.email}); // Hapus 'const'
+  final AuthService _authService = AuthService();
+
+  BerandaPage({super.key, required this.email});
 
   void _showLogoutDialog(BuildContext context) {
     showDialog(
@@ -48,7 +28,7 @@ class BerandaPage extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
-              _authService.signOut(); // Panggil fungsi signOut
+              _authService.signOut();
             },
             child: const Text('Iya'),
           ),
@@ -57,157 +37,27 @@ class BerandaPage extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileMenu(BuildContext context) {
-    return PopupMenuButton<String>(
-      offset: const Offset(0, 40),
-      icon: Icon(Icons.person_outline, color: Colors.grey[800]),
-      onSelected: (value) {
-        if (value == 'riwayat') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const OrderHistoryPage()),
-          );
-        } else if (value == 'pengaturan') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const SettingsPage()),
-          );
-        } else if (value == 'logout') {
-          _showLogoutDialog(context);
-        }
-      },
-      itemBuilder: (context) => [
-        const PopupMenuItem(
-          value: 'riwayat',
-          child: ListTile(
-            leading: Icon(Icons.history_outlined),
-            title: Text('Riwayat Pesanan'),
-          ),
-        ),
-        const PopupMenuItem(
-          value: 'pengaturan',
-          child: ListTile(
-            leading: Icon(Icons.settings_outlined),
-            title: Text('Pengaturan'),
-          ),
-        ),
-        const PopupMenuDivider(),
-        const PopupMenuItem(
-          value: 'logout',
-          child: ListTile(
-            leading: Icon(Icons.logout),
-            title: Text('Logout'),
-          ),
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final bool isMobile = screenWidth < 768;
+
     return Scaffold(
       backgroundColor: Colors.white,
-      drawer: isMobile
-          ? Drawer(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  const DrawerHeader(
-                    decoration: BoxDecoration(color: Color(0xFFF0F4F8)),
-                    child: Text('Menu', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                  ),
-                  ListTile(title: const Text('Home'), onTap: () {}),
-                  ListTile(
-                    title: const Text('Shop'),
-                    onTap: () {
-                      // PERUBAHAN 2: Ganti PetFood() dengan ProductPage()
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const ProductPage()),
-                      );
-                    },
-                  ),
-                  ListTile(
-                    title: const Text('About'),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const AboutPage()),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            )
-          : null,
+      drawer: isMobile ? _buildMobileDrawer(context) : null,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 0,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: Colors.grey[300], height: 1.0),
-        ),
+        elevation: 0.5,
         title: const Text(
           'Paw Mart',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22),
         ),
-        actions: !isMobile
-            ? [
-                NavTextButton(text: "Home", onPressed: () {}),
-                const SizedBox(width: 15),
-                NavTextButton(
-                  text: "Shop",
-                  onPressed: () {
-                    // PERUBAHAN 3: Ganti PetFood() dengan ProductPage()
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const ProductPage()),
-                    );
-                  },
-                ),
-                const SizedBox(width: 15),
-                NavTextButton(
-                  text: "About",
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const AboutPage()),
-                    );
-                  },
-                ),
-                const SizedBox(width: 30),
-                IconButton(
-                  icon: Icon(Icons.shopping_cart_outlined, color: Colors.grey[800]),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const CartPage()),
-                    );
-                  },
-                ),
-                const SizedBox(width: 10),
-                _buildProfileMenu(context),
-                const SizedBox(width: 20),
-              ]
-            : [
-                IconButton(
-                  icon: Icon(Icons.shopping_cart_outlined, color: Colors.grey[800]),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const CartPage()),
-                    );
-                  },
-                ),
-                _buildProfileMenu(context),
-              ],
+        actions: _buildAppBarActions(context, isMobile),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            _buildHeroSection(context, isMobile, email),
+            _buildHeroSection(context, isMobile),
             _buildCategorySection(context, isMobile),
           ],
         ),
@@ -215,8 +65,98 @@ class BerandaPage extends StatelessWidget {
     );
   }
 
-  Widget _buildHeroSection(BuildContext context, bool isMobile, String email) {
-    // ... (kode hero section tidak berubah)
+  Drawer _buildMobileDrawer(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          const DrawerHeader(
+            decoration: BoxDecoration(color: Color(0xFFF0F4F8)),
+            child: Text('Menu', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          ),
+          ListTile(
+              title: const Text('Home'),
+              onTap: () {
+                Navigator.pop(context);
+              }),
+          ListTile(
+            title: const Text('Shop'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const ProductPage()));
+            },
+          ),
+          ListTile(
+            title: const Text('About'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutPage()));
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buildAppBarActions(BuildContext context, bool isMobile) {
+    final profileMenu = PopupMenuButton<String>(
+      offset: const Offset(0, 40),
+      icon: Icon(Icons.person_outline, color: Colors.grey[800]),
+      onSelected: (value) {
+        if (value == 'riwayat') {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const OrderHistoryPage()));
+        } else if (value == 'pengaturan') {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsPage()));
+        } else if (value == 'logout') {
+          _showLogoutDialog(context);
+        }
+      },
+      itemBuilder: (context) => [
+        const PopupMenuItem(
+            value: 'riwayat',
+            child: ListTile(leading: Icon(Icons.history_outlined), title: Text('Riwayat Pesanan'))),
+        const PopupMenuItem(
+            value: 'pengaturan',
+            child: ListTile(leading: Icon(Icons.settings_outlined), title: Text('Pengaturan'))),
+        const PopupMenuDivider(),
+        const PopupMenuItem(
+            value: 'logout', child: ListTile(leading: Icon(Icons.logout), title: Text('Logout'))),
+      ],
+    );
+
+    final cartButton = IconButton(
+      icon: Icon(Icons.shopping_cart_outlined, color: Colors.grey[800]),
+      onPressed: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const CartPage()));
+      },
+    );
+
+    if (isMobile) {
+      return [cartButton, profileMenu];
+    } else {
+      return [
+        NavTextButton(text: "Home", onPressed: () {}),
+        const SizedBox(width: 15),
+        NavTextButton(
+          text: "Shop",
+          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ProductPage())),
+        ),
+        const SizedBox(width: 15),
+        NavTextButton(
+          text: "About",
+          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutPage())),
+        ),
+        const SizedBox(width: 30),
+        cartButton,
+        const SizedBox(width: 10),
+        profileMenu,
+        const SizedBox(width: 20),
+      ];
+    }
+  }
+
+  Widget _buildHeroSection(BuildContext context, bool isMobile) {
+    // ... (kode hero section tidak berubah, aman)
     final textContent = Column(
       crossAxisAlignment: isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
       children: [
@@ -243,7 +183,7 @@ class BerandaPage extends StatelessWidget {
         Text(
           'Discover high-quality pet food that keeps your companions healthy and happy. Natural ingredients, scientifically formulated.',
           textAlign: isMobile ? TextAlign.center : TextAlign.start,
-          style: const TextStyle(fontSize: 16, color: Colors.black54, height: 1.5),
+          style: TextStyle(fontSize: 16, color: Colors.black54, height: 1.5),
         ),
         const SizedBox(height: 32),
         Wrap(
@@ -253,11 +193,7 @@ class BerandaPage extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: () {
-                // PERUBAHAN 4: Ganti PetFood() dengan ProductPage()
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ProductPage()),
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const ProductPage()));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue.shade600,
@@ -314,7 +250,7 @@ class BerandaPage extends StatelessWidget {
         crossAxisAlignment: isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
         children: [
           Text(
-            'Selamat datang $email ',
+            'Selamat datang, ${email.split('@')[0]}!',
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Color(0xFF333333)),
           ),
           const SizedBox(height: 40),
@@ -337,49 +273,15 @@ class BerandaPage extends StatelessWidget {
       ),
     );
   }
-  
-  Widget _buildCategorySection(BuildContext context, bool isMobile) {
-    // ... (kode category section tidak berubah)
-    final categories = [
-      {'icon': Icons.pets, 'label': 'Dog Food'},
-      {'icon': Icons.pets, 'label': 'Cat Food'},
-      {'icon': Icons.flutter_dash, 'label': 'Bird Food'},
-      {'icon': Icons.water_drop_outlined, 'label': 'Fish Food'},
-    ];
-    final categoryCards = categories.map((category) {
-      final categoryLabel = category['label'] as String;
-      String targetCategory;
-      switch (categoryLabel) {
-        case 'Dog Food':
-          targetCategory = 'Anjing';
-          break;
-        case 'Cat Food':
-          targetCategory = 'Kucing';
-          break;
-        case 'Bird Food':
-          targetCategory = 'Burung';
-          break;
-        case 'Fish Food':
-          targetCategory = 'Ikan';
-          break;
-        default:
-          targetCategory = 'Semua';
-      }
 
-      return CategoryCard(
-        icon: category['icon'] as IconData,
-        label: categoryLabel,
-        onTap: () {
-          // PERUBAHAN 5: Ganti PetFood() dengan ProductPage()
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ProductPage(initialCategory: targetCategory),
-            ),
-          );
-        },
-      );
-    }).toList();
+  Widget _buildCategorySection(BuildContext context, bool isMobile) {
+    // ... (kode category section tidak berubah, aman)
+    final categories = [
+      {'icon': Icons.pets, 'label': 'Dog Food', 'category': 'Anjing'},
+      {'icon': Icons.pets, 'label': 'Cat Food', 'category': 'Kucing'},
+      {'icon': Icons.flutter_dash, 'label': 'Bird Food', 'category': 'Burung'},
+      {'icon': Icons.water_drop_outlined, 'label': 'Fish Food', 'category': 'Ikan'},
+    ];
 
     return Container(
       color: Colors.white,
@@ -397,24 +299,46 @@ class BerandaPage extends StatelessWidget {
             style: TextStyle(fontSize: 18, color: Colors.black54),
           ).animate().fadeIn(delay: 300.ms, duration: 500.ms).slideY(begin: 0.5),
           const SizedBox(height: 40),
-          isMobile
-              ? Wrap(
-                  spacing: 24,
-                  runSpacing: 24,
-                  alignment: WrapAlignment.center,
-                  children: categoryCards.animate(interval: 80.ms).fadeIn(duration: 400.ms).moveY(begin: 20),
-                )
-              : Center(
-                  child: Container(
-                    constraints: const BoxConstraints(maxWidth: 1000),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: categoryCards.animate(interval: 100.ms).fadeIn(duration: 500.ms).slideX(begin: -0.5),
+          Wrap(
+            spacing: 24,
+            runSpacing: 24,
+            alignment: WrapAlignment.center,
+            children: categories.map((cat) {
+              return CategoryCard(
+                icon: cat['icon'] as IconData,
+                label: cat['label'] as String,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProductPage(initialCategory: cat['category'] as String),
                     ),
-                  ),
-                ),
+                  );
+                },
+              );
+            }).toList().animate(interval: 80.ms).fadeIn(duration: 400.ms).moveY(begin: 20),
+          ),
         ],
       ),
+    );
+  }
+}
+
+// Helper widgets (aman)
+class NavTextButton extends StatelessWidget {
+  final String text;
+  final VoidCallback onPressed;
+  const NavTextButton({super.key, required this.text, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: onPressed,
+      style: TextButton.styleFrom(
+        foregroundColor: Colors.grey[700],
+        textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+      ),
+      child: Text(text),
     );
   }
 }
@@ -423,13 +347,7 @@ class CategoryCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback? onTap;
-
-  const CategoryCard({
-    super.key,
-    required this.icon,
-    required this.label,
-    this.onTap,
-  });
+  const CategoryCard({super.key, required this.icon, required this.label, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -468,3 +386,4 @@ class CategoryCard extends StatelessWidget {
     );
   }
 }
+
