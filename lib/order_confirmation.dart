@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:myapp/models/cart_item_model.dart';
 import 'package:myapp/order_succes.dart';
+import 'package:myapp/qr_payment.dart';
 import 'package:myapp/services/firestore_service.dart';
 
-// Diubah menjadi StatefulWidget agar bisa interaktif
 class OrderConfirmationPage extends StatefulWidget {
   final List<CartItem> itemsToCheckout;
 
@@ -17,11 +17,10 @@ class OrderConfirmationPage extends StatefulWidget {
 class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
   final FirestoreService _firestoreService = FirestoreService();
   
-  // State untuk menyimpan pilihan pengguna
   String _selectedShipping = 'Reguler'; 
+  String _selectedPayment = 'COD'; // Default pembayaran adalah COD
   bool _isLoading = false;
 
-  // Definisikan biaya pengiriman di sini
   final Map<String, double> _shippingCosts = {
     'Reguler': 15000.0,
     'Express': 25000.0,
@@ -29,37 +28,41 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
   };
 
   void _handlePlaceOrder(double totalAmount) async {
-    setState(() { _isLoading = true; });
-
-    try {
-      // Panggil service untuk membuat pesanan di Firestore
-      await _firestoreService.placeOrder(widget.itemsToCheckout, totalAmount);
-
-      if (mounted) {
-        // Jika berhasil, navigasi ke halaman sukses
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (context) => OrderSuccessPage(
-              orderedItems: widget.itemsToCheckout,
-              totalAmount: totalAmount,
-              // Anda bisa generate Order ID yang lebih kompleks nanti
-              orderId: 'INV-${DateTime.now().millisecondsSinceEpoch}',
+    if (_selectedPayment == 'COD') {
+      setState(() { _isLoading = true; });
+      try {
+        await _firestoreService.placeOrder(widget.itemsToCheckout, totalAmount, 'COD');
+        if (mounted) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => OrderSuccessPage(
+                orderedItems: widget.itemsToCheckout,
+                totalAmount: totalAmount,
+                orderId: 'INV-${DateTime.now().millisecondsSinceEpoch}',
+              ),
             ),
+            (route) => route.isFirst,
+          );
+        }
+      } catch (e) {
+         if(mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal membuat pesanan: $e')));
+         }
+      } finally {
+        if (mounted) {
+          setState(() { _isLoading = false; });
+        }
+      }
+    } else if (_selectedPayment == 'QRIS') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => QrPaymentPage(
+            itemsToCheckout: widget.itemsToCheckout,
+            totalAmount: totalAmount,
           ),
-          (route) => route.isFirst, // Hapus semua halaman sebelumnya
-        );
-      }
-    } catch (e) {
-      // Jika gagal, tampilkan pesan error
-      if(mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal membuat pesanan: $e')),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() { _isLoading = false; });
-      }
+        ),
+      );
     }
   }
 
@@ -88,16 +91,52 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
             const SizedBox(height: 12),
             _buildShippingMethod(),
             const SizedBox(height: 12),
+            _buildPaymentMethod(), // <-- WIDGET PEMBAYARAN BARU
+            const SizedBox(height: 12),
             _buildPaymentSummary(subtotal, shippingCost, totalAmount, formatCurrency),
           ],
         ),
       ),
-      // Tombol "Buat Pesanan" di bagian bawah, seperti Shopee
       bottomNavigationBar: _buildBottomBar(totalAmount, formatCurrency),
     );
   }
 
-  // WIDGET BARU: Bagian Alamat
+  // --- WIDGET BARU: Bagian Pemilihan Metode Pembayaran ---
+  Widget _buildPaymentMethod() {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 1,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Metode Pembayaran', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+             const Divider(height: 24),
+            // Menggunakan DropdownButton
+            DropdownButtonFormField<String>(
+              value: _selectedPayment,
+              items: const [
+                DropdownMenuItem(value: 'COD', child: Text('COD (Bayar di Tempat)')),
+                DropdownMenuItem(value: 'QRIS', child: Text('QRIS (Pembayaran Digital)')),
+              ],
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() => _selectedPayment = value);
+                }
+              },
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Sisa widget tidak ada perubahan signifikan
   Widget _buildAddressSection() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -114,7 +153,6 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
                 children: [
                   const Text('Alamat Pengiriman', style: TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 4),
-                  // Nanti alamat ini bisa diambil dari data user di Firestore
                   Text(
                     'riski (+62) 812-3456-7890\nJl. Pahlawan No. 123, Kota Pahlawan, 12345',
                     style: TextStyle(color: Colors.grey[700], fontSize: 13),
@@ -129,7 +167,6 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
     );
   }
   
-  // WIDGET BARU: Daftar Produk
   Widget _buildProductList(NumberFormat formatCurrency) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -148,7 +185,6 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
     );
   }
 
-  // WIDGET BARU: Pilihan Pengiriman
   Widget _buildShippingMethod() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -160,7 +196,6 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
           children: [
             const Text('Opsi Pengiriman', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 8),
-            // Loop untuk membuat pilihan radio
             ..._shippingCosts.keys.map((method) => RadioListTile<String>(
               title: Text(method),
               value: method,
@@ -181,10 +216,9 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
     );
   }
 
-  // WIDGET BARU: Rincian Pembayaran
   Widget _buildPaymentSummary(double subtotal, double shippingCost, double total, NumberFormat format) {
     return Card(
-       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 1,
        child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -203,7 +237,6 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
     );
   }
   
-  // Widget untuk tombol "Buat Pesanan" di bawah
   Widget _buildBottomBar(double totalAmount, NumberFormat formatCurrency) {
     return Container(
       padding: const EdgeInsets.all(16.0),
@@ -241,14 +274,13 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
             ),
             child: _isLoading 
                 ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3))
-                : const Text('Buat Pesanan'),
+                : Text(_selectedPayment == 'QRIS' ? 'Lanjutkan Pembayaran' : 'Buat Pesanan'),
           ),
         ],
       ),
     );
   }
-
-  // Widget-widget pembantu yang sudah ada sebelumnya, sedikit disesuaikan
+  
   Widget _buildOrderItem(CartItem item, NumberFormat formatCurrency) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),

@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:myapp/models/cart_item_model.dart';
 import 'package:myapp/services/firestore_service.dart';
 import 'order_confirmation.dart';
-import 'order_succes.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -47,7 +46,8 @@ class _CartPageState extends State<CartPage> {
     );
   }
 
-  void _checkoutSelectedItems() async {
+  // --- FUNGSI CHECKOUT YANG DIPERBAIKI ---
+  void _checkoutSelectedItems() {
     if (_selectedItems.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -60,38 +60,15 @@ class _CartPageState extends State<CartPage> {
 
     final List<CartItem> itemsToCheckout = _selectedItems.toList();
     
-    // Navigasi ke halaman konfirmasi
-    final bool? checkoutConfirmed = await Navigator.push(
+    // Tugas CartPage hanya sampai di sini: navigasi ke halaman konfirmasi.
+    // Logika placeOrder dan navigasi ke OrderSuccessPage sekarang sepenuhnya
+    // ditangani oleh OrderConfirmationPage dan QrPaymentPage.
+    Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => OrderConfirmationPage(itemsToCheckout: itemsToCheckout),
       ),
     );
-
-    // Jika user mengkonfirmasi di halaman berikutnya
-    if (checkoutConfirmed == true && mounted) {
-      final double totalAmount = itemsToCheckout.fold(0.0, (sum, item) => sum + (item.price * item.quantity));
-      final String orderId = 'INV-${DateFormat('ddMMyyyy-HHmm').format(DateTime.now())}';
-
-      // Panggil fungsi placeOrder
-      await _firestoreService.placeOrder(itemsToCheckout, totalAmount);
-      
-      setState(() {
-        _selectedItems.clear();
-      });
-
-      // Navigasi ke halaman sukses
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => OrderSuccessPage(
-            orderedItems: itemsToCheckout,
-            totalAmount: totalAmount,
-            orderId: orderId,
-          ),
-        ),
-      );
-    }
   }
 
   @override
@@ -115,7 +92,6 @@ class _CartPageState extends State<CartPage> {
           }
 
           final cartItems = snapshot.data!;
-          // Membersihkan item terpilih yang mungkin sudah tidak ada di keranjang
           _selectedItems.removeWhere((selected) => !cartItems.any((cart) => cart.id == selected.id));
           bool isAllSelected = cartItems.isNotEmpty && _selectedItems.length == cartItems.length;
 
@@ -142,7 +118,7 @@ class _CartPageState extends State<CartPage> {
   }
 
   Widget _buildSelectAllHeader(List<CartItem> currentCart, bool isAllSelected) {
-     return Padding(
+   return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       child: Row(
         children: [
@@ -158,7 +134,6 @@ class _CartPageState extends State<CartPage> {
   }
 
   Widget _buildEmptyCartView() {
-    // ... (kode tidak berubah)
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -175,15 +150,13 @@ class _CartPageState extends State<CartPage> {
   }
 
   Widget _buildCartItemCard(CartItem item, bool isSelected, List<CartItem> cartItems) {
-    // ... (logika UI sebagian besar sama, hanya akses data yang berubah)
     final formatCurrency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
 
     return Dismissible(
-      key: Key(item.id), // Gunakan ID dari Firestore
+      key: Key(item.id), 
       direction: DismissDirection.endToStart,
       onDismissed: (direction) => _removeItem(item),
       background: Container(
-        // ... (kode tidak berubah)
         decoration: BoxDecoration(
           color: Colors.red.shade400,
           borderRadius: BorderRadius.circular(12),
@@ -194,7 +167,6 @@ class _CartPageState extends State<CartPage> {
         child: const Icon(Icons.delete_outline, color: Colors.white),
       ),
       child: Card(
-        // ... (kode tidak berubah)
         margin: const EdgeInsets.only(bottom: 12),
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -247,7 +219,6 @@ class _CartPageState extends State<CartPage> {
   }
 
   Widget _buildSummaryCard() {
-    // ... (kode tidak berubah, hanya akses data yang berbeda)
     final double totalPrice = _selectedItems.fold(0.0, (sum, item) => sum + (item.price * item.quantity));
     final String formattedTotalPrice = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(totalPrice);
     
@@ -283,3 +254,4 @@ class _CartPageState extends State<CartPage> {
     );
   }
 }
+

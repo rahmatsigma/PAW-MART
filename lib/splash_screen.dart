@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-// PERUBAHAN 1: Ganti tujuan import dari login.dart ke main.dart
-import 'package:myapp/main.dart'; 
+import 'auth_gate.dart'; // <-- PERBAIKAN UTAMA DI SINI
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -15,7 +14,6 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
-  late Animation<double> _textFadeAnimation;
 
   @override
   void initState() {
@@ -38,28 +36,22 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
 
-    _textFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.6, 1.0, curve: Curves.easeIn),
-      ),
-    );
-
     _controller.forward();
 
     Timer(const Duration(seconds: 4), () {
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          // PERUBAHAN 2: Arahkan ke AuthGate, bukan LoginPage
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              const AuthGate(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 800),
-        ),
-      );
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                const AuthGate(), // Sekarang sudah dikenal
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 800),
+          ),
+        );
+      }
     });
   }
 
@@ -94,7 +86,7 @@ class _SplashScreenState extends State<SplashScreen>
                 child: ScaleTransition(
                   scale: _scaleAnimation,
                   child: Image.asset(
-                    'assets/images/logo2.png', // Saya pertahankan logo2.png Anda
+                    'assets/images/logo2.png',
                     width: 500,
                     height: 500,
                   ),

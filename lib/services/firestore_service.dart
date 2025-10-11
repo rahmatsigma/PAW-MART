@@ -109,7 +109,8 @@ class FirestoreService {
   }
 
   // --- MANAJEMEN PESANAN (ORDER) ---
-  Future<void> placeOrder(List<CartItem> cartItems, double totalPrice) async {
+  // PERUBAHAN DI SINI: Tambah parameter paymentMethod
+  Future<void> placeOrder(List<CartItem> cartItems, double totalPrice, String paymentMethod) async {
     final userId = getCurrentUserId();
     if (userId == null) return;
 
@@ -120,6 +121,7 @@ class FirestoreService {
       'orderDate': Timestamp.now(),
       'totalPrice': totalPrice,
       'status': 'Diproses',
+      'paymentMethod': paymentMethod, // Simpan metode pembayaran
     });
 
     WriteBatch batch = _db.batch();
